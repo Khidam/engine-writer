@@ -1,0 +1,31 @@
+name: Lightweight Release
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'app/**'
+      - '.github/workflows/lightweight-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package
+        run: |
+          mkdir -p out/EngineWriter
+          cp app/EngineWriter.html out/EngineWriter/index.html
+          cp README.md out/EngineWriter/README.md
+          cd out
+          zip -9 -r EngineWriter-Lightweight.zip EngineWriter
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="lightweight-${{ github.run_number }}"
+          gh release create "$TAG" out/EngineWriter-Lightweight.zip app/EngineWriter.html --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "Engine Writer Lightweight ${{ github.run_number }}" --notes "Lightweight HTML5 Canvas build. No Unity or .NET runtime required."
