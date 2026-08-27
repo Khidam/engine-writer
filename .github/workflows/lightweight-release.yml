@@ -1,10 +1,11 @@
-name: Lightweight Release
+name: World Desk Lightweight Release
 
 on:
   push:
     branches: [ main ]
     paths:
       - 'app/**'
+      - 'launcher/**'
       - '.github/workflows/lightweight-release.yml'
   workflow_dispatch:
 
@@ -12,20 +13,37 @@ permissions:
   contents: write
 
 jobs:
-  package:
-    runs-on: ubuntu-latest
+  build-release:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Package
+
+      - name: Compile tiny Windows launcher
+        shell: pwsh
         run: |
-          mkdir -p out/EngineWriter
-          cp app/EngineWriter.html out/EngineWriter/index.html
-          cp README.md out/EngineWriter/README.md
-          cd out
-          zip -9 -r EngineWriter-Lightweight.zip EngineWriter
-      - name: Release
+          $csc = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+          if (!(Test-Path $csc)) { throw "Windows .NET Framework C# compiler not found" }
+          & $csc /nologo /target:winexe /optimize+ /reference:System.Windows.Forms.dll /out:EngineWriter.exe launcher/EngineWriterLauncher.cs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Package World Desk
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path out/EngineWriter | Out-Null
+          Copy-Item EngineWriter.exe out/EngineWriter/EngineWriter.exe
+          Copy-Item app/EngineWriter.html out/EngineWriter/EngineWriter.html
+          Copy-Item README.md out/EngineWriter/README.md
+          Compress-Archive -Path out/EngineWriter/* -DestinationPath EngineWriter-WorldDesk-Windows.zip -Force
+          Get-Item EngineWriter.exe, app/EngineWriter.html, EngineWriter-WorldDesk-Windows.zip | Select-Object Name, Length
+
+      - name: Publish GitHub Release
+        shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="lightweight-${{ github.run_number }}"
-          gh release create "$TAG" out/EngineWriter-Lightweight.zip app/EngineWriter.html --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "Engine Writer Lightweight ${{ github.run_number }}" --notes "Lightweight HTML5 Canvas build. No Unity or .NET runtime required."
+          $tag = "worlddesk-${{ github.run_number }}"
+          gh release create $tag EngineWriter-WorldDesk-Windows.zip EngineWriter.exe app/EngineWriter.html `
+            --repo "${{ github.repository }}" `
+            --target "${{ github.sha }}" `
+            --title "Engine Writer World Desk ${{ github.run_number }}" `
+            --notes "World Desk preview: lightweight Windows launcher + offline HTML simulation. Live terrain/frontline, logistics, ammo/fuel/morale, weather, aircraft missions, persistent wrecks, chapter rail, evidence-based Testar, Reader and local Publish. No Unity and no self-contained .NET runtime."
