@@ -1,61 +1,50 @@
-# Engine Writer — World Desk
+# Prince Titan
 
-Engine Writer é uma engine de escrita para webnovels que combina uma **mesa de escrita calma** com um **mundo militar vivo em 1944**. A regra de produto é simples: quando você quer escrever, o texto domina; quando quer brincar com o cenário, o mapa vira a mesa principal.
+**Prince Titan** é uma engine de escrita em Unity com um mundo vivo sempre visível ao lado do manuscrito. O objetivo é abrir o aplicativo, escrever e, quando quiser respirar, simplesmente observar aviões, robôs, mercados, companhias, casas e relações de poder se movendo no atlas.
 
-## World Desk preview
+## O que já funciona
 
-A versão atual roda em um HTML offline leve e possui um launcher Windows pequeno. Não exige Unity e não embute um runtime .NET de centenas de megabytes.
+- editor de capítulos com título, contagem de palavras e atalhos;
+- autosave local em JSON e backup automático;
+- exportação do capítulo ativo em UTF-8 `.txt`;
+- mapa lateral e atlas expandido desenhados proceduralmente pelo Unity;
+- 14 lugares visíveis: cidades, mercados, empresas, casas, porto, aeródromo, relé e fábricas de robôs;
+- aviões em rotas contínuas e um transporte robótico em movimento;
+- atividade dos mercados, relógio mundial e eventos ambientes;
+- quatro poderes que disputam influência: Império, Governo, Clã e Empreiteira;
+- filtros por poder sem esconder permanentemente nenhum dado;
+- árvore biológica e política com nome, família, origem, nascimento, função e aliança de cada pessoa;
+- simulação independente da escrita: escrever nunca altera artificialmente quem vence o mapa.
 
-### WRITE DESK
+## Direção visual
 
-- trilho de capítulos e autosave local;
-- perfis EN / CN / KR;
-- editor em papel amplo, sem dashboard agressivo;
-- `Testar capítulo`: no máximo três achados com evidência textual e sem reescrever a prosa;
-- `Ler`: modo leitor limpo para sentir o capítulo como leitor;
-- `Publicar`: exporta capítulo UTF-8 e manifesto local;
-- `Quiet Write`: reduz o mapa a uma presença visual discreta;
-- rádio ambiente procedural opcional.
+A identidade é original: espionagem editorial de meados do século, cartões de inteligência, carvão, branco marfim, magenta e latão. O mapa mistura papel aquecido pelo sol, tinta, rotas pontilhadas e movimento discreto. As imagens de referência serviram apenas para definir clima e composição; nenhum asset, personagem, arma, logotipo ou interface proprietária foi copiado.
 
-### WORLD TABLE
+## Baixar e abrir rapidamente
 
-- mapa alternável entre tático 2D e relevo em perspectiva;
-- terreno com água, planície, floresta, terreno seco e elevação rochosa;
-- cidades, estradas e linha de frente calculada pela influência real das forças;
-- infantaria, blindados, artilharia e unidades de suprimento;
-- HP, moral, fadiga, munição, combustível e suprimento;
-- movimento afetado por terreno e clima;
-- combate, retirada, captura de cidades e destroços persistentes;
-- aviação com base, combustível, munição, missões CAP/recon/strike, retorno e combate aéreo;
-- clima dinâmico com visibilidade e penalidades de movimento/aviação;
-- produção de suprimento nas cidades e consumo logístico das unidades;
-- rádio de campo registrando eventos realmente produzidos pela simulação.
+1. Abra **Releases** neste repositório.
+2. Baixe `PrinceTitan-Windows-x64.zip` da release mais recente.
+3. Extraia o ZIP.
+4. Dê dois cliques em `PrinceTitan.exe`.
 
-Escrever não concede bônus artificiais às forças. A escrita só libera resumos discretos do que aconteceu no mundo; o resultado militar vem da simulação.
+Você não precisa abrir o Unity nem compilar no seu PC para usar uma release pronta.
 
-## Download
+## Primeiro build no GitHub
 
-Abra a aba **Releases** e procure a release mais recente `Engine Writer World Desk`. O ZIP contém:
+O GitHub Actions precisa ativar a sua licença Unity Personal uma única vez. Adicione estes três Secrets em **Settings → Secrets and variables → Actions**:
 
-- `EngineWriter.exe` — launcher pequeno;
-- `EngineWriter.html` — aplicativo/simulação offline;
-- `README.md`.
+- `UNITY_LICENSE`: conteúdo completo de `C:\ProgramData\Unity\Unity_lic.ulf`;
+- `UNITY_EMAIL`: e-mail da conta Unity;
+- `UNITY_PASSWORD`: senha da conta Unity.
 
-O launcher usa o Microsoft Edge instalado no Windows em modo aplicativo e, se não encontrar Edge, abre o HTML no navegador padrão.
+Depois abra **Actions → Prince Titan Unity Windows Release → Run workflow**. O workflow compila no servidor e cria a release com o ZIP automaticamente. Nunca coloque a senha em arquivo do repositório, issue ou conversa.
 
-## Direção artística
+## Dados locais
 
-A interface usa uma direção original inspirada por comunicação militar de 1944, ilustração comercial/editorial do século XX, formas gráficas fortes e contraste de equipes. Não inclui assets, personagens ou arte proprietária de Team Fortress 2, Adventure Time/Card Wars, J.C. Leyendecker, Dean Cornwell ou Norman Rockwell.
+No Windows, o projeto e os exports ficam dentro da pasta persistente do Unity, em `AppData/LocalLow/Khidam/Prince Titan/PrinceTitan`. O arquivo principal é `project.json`; cada gravação também mantém `project.json.backup`.
 
-## Próximas prioridades
+## Código anterior preservado
 
-1. elevar o relevo para WebGL/Three.js offline mantendo o pacote pequeno;
-2. logística por estrada/depósito em vez de distância simples;
-3. ordens operacionais e rotas editáveis;
-4. inteligência incompleta/fog of war;
-5. dano de veículos e aeronaves por subsistema;
-6. conectar lugares e acontecimentos do mapa ao contexto do capítulo sem transformar o editor em uma Story Bible.
+Os protótipos HTML/WinForms anteriores continuam nas pastas `app/`, `launcher/` e `src/`. A implementação canônica nova é o projeto Unity em `Assets/`, `Packages/` e `ProjectSettings/`.
 
-## Licença
-
-MIT para o código original deste repositório.
+Licença MIT para o código original deste repositório.

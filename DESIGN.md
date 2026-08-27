@@ -1,43 +1,33 @@
-# Engine Writer — Design Brief
+# Prince Titan — Design Brief
 
 ## Fantasia central
 
-Você é um escritor-operador em uma estação de rádio de 1944. O manuscrito é a transmissão. Cada trecho escrito aumenta o sinal e movimenta uma pequena campanha no mapa.
+O escritor trabalha diante de um manuscrito limpo enquanto um atlas vivo respira ao lado. O mapa não é um prêmio pelo número de palavras: é a janela constante para um mundo grande demais para caber na página atual.
 
-## Loop de 5 minutos
+## Estrutura do mundo
 
-1. Receber uma micro-missão pelo rádio.
-2. Escrever normalmente.
-3. A cada marco de palavras, gerar Signal e avançar a simulação.
-4. Observar mudanças nas quatro frentes do mapa.
-5. Quando quiser, acionar Critic -> Builder e receber uma única missão de revisão.
+Quatro instituições controlam território e influência:
 
-## Simulação de mapa
+1. **Império** — coroa, famílias nobres, indústria militar e memória territorial.
+2. **Governo** — ministérios civis, aviação, portos e comunicações.
+3. **Clã** — parentesco, mercados, caravanas, casas e informação familiar.
+4. **Empreiteira** — robótica, contratos, vendas, origem e destino de máquinas.
 
-Quatro frentes representam quatro linhas narrativas. Cada frente possui:
-- tensão;
-- controle;
-- sinal;
-- terreno;
-- ameaça;
-- um marcador de personagem/objetivo.
+Famílias não são um quinto poder. Elas atravessam os quatro poderes e aparecem na árvore biológica/política.
 
-A escrita não é punida. Mesmo texto imperfeito gera progresso visual; a análise serve para sugerir onde investir o próximo bloco.
+## Princípios de interface
 
-## Direção de arte
+- O texto ocupa a maior área e nunca é bloqueado pela simulação.
+- Tudo no atlas continua consultável: mercados, empresas, casas, robôs, aviões e pessoas.
+- O movimento é calmo, lento e legível; observar o mapa deve lembrar luz do sol atravessando uma sala.
+- Magenta e branco criam identidade; carvão e latão dão peso de espionagem editorial.
+- Nenhum asset ou personagem de referência é reproduzido.
+- O mundo persiste localmente e funciona offline.
 
-- formas grandes e legíveis;
-- geometria simplificada e cartunesca;
-- papel envelhecido, tinta escura, vermelho de sinal, verde de campanha e âmbar de rádio;
-- tipografia e painéis com sensação de equipamento de campo;
-- ilustração futura deve ser original, usando somente referências históricas/estéticas, nunca assets copiados.
+## Fluxos principais
 
-## Webnovel profiles
+**Escrever:** escolher capítulo → escrever → autosave → exportar.
 
-**CN:** tolera capítulos mais longos, progressão serial forte e payoff por arco.
+**Observar:** acompanhar rotas → selecionar lugar → ler controlador, função e influência.
 
-**KR:** foco em ritmo, progressão clara, cenas funcionais e cliffhangers frequentes.
-
-**EN:** equilíbrio entre cena, voz, clareza e hooks de capítulo.
-
-Os perfis alteram apenas metas e mensagens do coach; não “corrigem” cultura ou estilo do autor.
+**Entender pessoas:** abrir Lineages → seguir parentesco → comparar origem, papel e aliança.

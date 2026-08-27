@@ -1,35 +1,31 @@
-# Roadmap
+# Prince Titan Roadmap
 
-## v0.1 — Current MVP
-- Runtime writing desk built entirely from C#.
-- 2D tactical / 3D relief map toggle.
-- Four-front terrain simulation with campaign events.
-- CN/KR/EN webnovel pacing profiles.
-- Local Critic -> Builder loop.
-- Autosave + TXT/Markdown export.
+## v0.1 — Unity living desk
 
-## v0.2 — Writer comfort
-- Chapter/library browser.
-- Keyboard-first command palette.
-- Typewriter/radio ambient audio with independent volume.
-- Focus timers that never block typing.
-- Theme presets and accessibility controls.
+- editor de capítulos, autosave, backup e exportação;
+- mapa compacto e atlas expandido;
+- quatro poderes e 14 lugares;
+- aviação, robô, mercados e relógio ambientes;
+- árvore biológica/política;
+- release automática Windows x64.
 
-## v0.3 — Rich story world
-- Drag-and-drop character/object cards onto fronts.
-- Relationship/intel board.
-- Custom map seeds and named locations.
-- Story-event deck editable as ScriptableObjects.
-- Timeline that links map turns to chapter paragraphs.
+## v0.2 — World authoring
 
-## v0.4 — Webnovel workflow
-- Project templates for serial release cadence.
-- Per-chapter metadata and arc planning.
-- Copy/export formatting presets for common publishing workflows.
-- Optional local/offline LLM adapter behind an interface; never required to write.
+- criar, editar e remover pessoas, famílias, lugares e poderes pelo aplicativo;
+- desenhar novas estradas e rotas diretamente no mapa;
+- histórico de empregos, títulos e mudanças de aliança;
+- cadastro completo de robôs: altura, dano por parte, origem, comprador e sucata persistente.
+
+## v0.3 — Manuscript intelligence
+
+- vincular parágrafos a lugares e pessoas sem criar um painel pesado;
+- linha do tempo pesquisável;
+- busca global por nome, empresa, mercado ou evento;
+- versões e comparação de capítulos.
 
 ## Guardrails
-- No copyrighted game assets.
-- No forced gamification.
-- No network dependency for the core editor.
-- Every simulation feature must answer: “does this make writing more pleasant or help the author see the story?”
+
+- nenhuma arte proprietária copiada;
+- nenhuma dependência de rede para escrever;
+- simulação nunca altera o manuscrito;
+- tudo deve tornar o mundo mais legível ou a escrita mais tranquila.

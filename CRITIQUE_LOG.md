@@ -1,23 +1,26 @@
 # Builder / Critic Iteration Log
 
-## Pass 1 — Is the map actually part of writing?
-**Critic:** A decorative map would become background noise. The writer needs a causal connection between typing and the world.
+## Pass 1 — O mapa é parte da escrita?
+**Critic:** Um mapa decorativo vira ruído de fundo.
 
-**Builder change:** Positive word deltas generate Signal. Every 80 new words advance one front. The radio reports the consequence and the relief mesh changes.
+**Builder:** A nova regra separa causalidade e companhia: escrever não concede poder, mas o atlas permanece útil porque cada marcador revela lugar, função, controlador e contexto.
 
-## Pass 2 — Is the simulation deep enough to remain interesting?
-**Critic:** Four meters moving up and down is too cosmetic for the requested board/card-game feeling.
+## Pass 2 — A simulação é profunda ou apenas animada?
+**Critic:** Pontos se movendo não explicam um mundo.
 
-**Builder change:** Fronts gained terrain modifiers, momentum, intel, threat propagation and deterministic campaign events such as Intercept, False Flag, Supply Drop, Radio Fog and Breakthrough.
+**Builder:** Foram adicionados quatro modelos institucionais, influência persistente, mercados com atividade, locais tipados, aviões com origem/destino, trânsito robótico e eventos ambientes.
 
-## Pass 3 — Does the game layer interrupt the writer?
-**Critic:** Too much evaluation turns a relaxing writing tool into a dashboard. Portability also matters more than framework complexity at this stage.
+## Pass 3 — A direção visual copia as referências?
+**Critic:** Reproduzir a interface, armas ou personagens de outra obra deixaria o projeto dependente e sem identidade.
 
-**Builder change:** Critic returns at most three notes; Builder converts only the top issue into one optional micro-mission. The runtime uses standard Unity C#/uGUI and procedural primitives, with no required art pack or network call.
+**Builder:** A estética virou uma linguagem original de espionagem editorial: magenta, marfim, carvão, latão, cartões, tinta e pergaminho solar. Todos os elementos são desenhados proceduralmente.
 
-## Next critical questions
-1. Does a 15–30 minute writing session feel calmer or noisier with radio events enabled?
-2. Should map turns be 80 words, time-based, or user-configurable?
-3. Do authors want four fronts tied to plotlines, POV characters, factions, or locations?
-4. Which export formatting is actually needed before publishing to each webnovel platform?
-5. Add audio only after a mute/volume-first accessibility design exists.
+## Pass 4 — A árvore ajuda de verdade?
+**Critic:** Um “dossiê” isolado não mostra biologia nem atravessamento político.
+
+**Builder:** A tela Lineages liga pais e filhos visualmente e coloca em cada moldura origem, nascimento, família, papel e poder atual.
+
+## Pass 5 — É realmente rápido abrir?
+**Critic:** Entregar apenas fonte Unity contradiz o objetivo de abrir o aplicativo imediatamente.
+
+**Builder:** O GitHub Actions agora gera `PrinceTitan.exe`, compacta a pasta completa e publica uma Release. A única dependência externa é a ativação segura e única da licença Unity nos Secrets do repositório.
