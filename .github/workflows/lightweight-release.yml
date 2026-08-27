@@ -23,18 +23,20 @@ jobs:
         run: |
           $csc = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
           if (!(Test-Path $csc)) { throw "Windows .NET Framework C# compiler not found" }
-          & $csc /nologo /target:winexe /optimize+ /reference:System.Windows.Forms.dll /out:EngineWriter.exe launcher/EngineWriterLauncher.cs
+          $source = Join-Path $PWD "launcher\EngineWriterLauncher.cs"
+          if (!(Test-Path $source)) { throw "Launcher source not found: $source" }
+          & $csc /nologo /target:winexe /optimize+ /reference:System.Windows.Forms.dll /out:EngineWriter.exe $source
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Package World Desk
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path out/EngineWriter | Out-Null
-          Copy-Item EngineWriter.exe out/EngineWriter/EngineWriter.exe
-          Copy-Item app/EngineWriter.html out/EngineWriter/EngineWriter.html
-          Copy-Item README.md out/EngineWriter/README.md
-          Compress-Archive -Path out/EngineWriter/* -DestinationPath EngineWriter-WorldDesk-Windows.zip -Force
-          Get-Item EngineWriter.exe, app/EngineWriter.html, EngineWriter-WorldDesk-Windows.zip | Select-Object Name, Length
+          New-Item -ItemType Directory -Force -Path out\EngineWriter | Out-Null
+          Copy-Item EngineWriter.exe out\EngineWriter\EngineWriter.exe
+          Copy-Item app\EngineWriter.html out\EngineWriter\EngineWriter.html
+          Copy-Item README.md out\EngineWriter\README.md
+          Compress-Archive -Path out\EngineWriter\* -DestinationPath EngineWriter-WorldDesk-Windows.zip -Force
+          Get-Item EngineWriter.exe, app\EngineWriter.html, EngineWriter-WorldDesk-Windows.zip | Select-Object Name, Length
 
       - name: Publish GitHub Release
         shell: pwsh
