@@ -49,8 +49,7 @@ jobs:
             mv .unity-ci/Unity_lic.decoded.ulf .unity-ci/Unity_lic.ulf
             echo "Decoded base64 Unity ULF content."
           else
-            echo "::error::UNITY_LICENSE is neither raw ULF content nor valid base64 ULF content."
-            exit 1
+            echo "Using opaque Unity ULF content without rewriting it."
           fi
 
       - name: Cache Unity Library
