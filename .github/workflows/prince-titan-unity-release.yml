@@ -24,33 +24,26 @@ jobs:
     timeout-minutes: 45
     env:
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
 
     steps:
-      - name: Check Unity Personal license
+      - name: Check Unity Personal activation
         shell: bash
         run: |
           missing=0
           if [ -z "$UNITY_LICENSE" ]; then echo "::error::Add the UNITY_LICENSE secret containing Unity_lic.ulf"; missing=1; fi
+          if [ -z "$UNITY_EMAIL" ]; then echo "::error::Add the UNITY_EMAIL secret"; missing=1; fi
+          if [ -z "$UNITY_PASSWORD" ]; then echo "::error::Add the UNITY_PASSWORD secret"; missing=1; fi
+          if [[ "$UNITY_LICENSE" != *'<DeveloperData Value="'* ]]; then
+            echo "::error::UNITY_LICENSE must contain the raw XML text from Unity_lic.ulf, not the file path, filename, or encoded data."
+            missing=1
+          fi
           exit $missing
 
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Prepare local Unity license
-        shell: bash
-        run: |
-          mkdir -p .unity-ci
-          printf '%s' "$UNITY_LICENSE" > .unity-ci/Unity_lic.ulf
-          test -s .unity-ci/Unity_lic.ulf
-          if grep -q '<DeveloperData Value="' .unity-ci/Unity_lic.ulf; then
-            echo "Using raw Unity ULF content."
-          elif printf '%s' "$UNITY_LICENSE" | base64 --decode > .unity-ci/Unity_lic.decoded.ulf 2>/dev/null && test -s .unity-ci/Unity_lic.decoded.ulf; then
-            mv .unity-ci/Unity_lic.decoded.ulf .unity-ci/Unity_lic.ulf
-            echo "Decoded base64 Unity ULF content."
-          else
-            echo "Using opaque Unity ULF content without rewriting it."
-          fi
 
       - name: Cache Unity Library
         uses: actions/cache@v4
@@ -66,6 +59,8 @@ jobs:
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: .
           unityVersion: auto
@@ -75,8 +70,6 @@ jobs:
           buildName: PrinceTitan
           allowDirtyBuild: true
           versioning: Semantic
-          skipActivation: true
-          customParameters: -manualLicenseFile /github/workspace/.unity-ci/Unity_lic.ulf
 
       - name: Verify and package app
         shell: bash
@@ -106,8 +99,3 @@ jobs:
             --target "${{ github.sha }}" \
             --title "Prince Titan v0.1.${{ github.run_number }}" \
             --notes "Unity Windows x64 preview. Download the ZIP, extract it, and double-click PrinceTitan.exe. Includes the manuscript editor, local autosave/export, living influence atlas, moving aircraft and robot traffic, markets, estates, companies, and the biological/political lineage tree."
-
-      - name: Remove temporary license file
-        if: always()
-        shell: bash
-        run: rm -f .unity-ci/Unity_lic.ulf .unity-ci/Unity_lic.decoded.ulf
