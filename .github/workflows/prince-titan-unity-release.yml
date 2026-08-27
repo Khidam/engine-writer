@@ -43,7 +43,15 @@ jobs:
           mkdir -p .unity-ci
           printf '%s' "$UNITY_LICENSE" > .unity-ci/Unity_lic.ulf
           test -s .unity-ci/Unity_lic.ulf
-          grep -q '<DeveloperData Value="' .unity-ci/Unity_lic.ulf
+          if grep -q '<DeveloperData Value="' .unity-ci/Unity_lic.ulf; then
+            echo "Using raw Unity ULF content."
+          elif printf '%s' "$UNITY_LICENSE" | base64 --decode > .unity-ci/Unity_lic.decoded.ulf 2>/dev/null && test -s .unity-ci/Unity_lic.decoded.ulf; then
+            mv .unity-ci/Unity_lic.decoded.ulf .unity-ci/Unity_lic.ulf
+            echo "Decoded base64 Unity ULF content."
+          else
+            echo "::error::UNITY_LICENSE is neither raw ULF content nor valid base64 ULF content."
+            exit 1
+          fi
 
       - name: Cache Unity Library
         uses: actions/cache@v4
@@ -103,4 +111,4 @@ jobs:
       - name: Remove temporary license file
         if: always()
         shell: bash
-        run: rm -f .unity-ci/Unity_lic.ulf
+        run: rm -f .unity-ci/Unity_lic.ulf .unity-ci/Unity_lic.decoded.ulf
