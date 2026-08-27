@@ -1,46 +1,61 @@
-# Engine Writer
+# Engine Writer — World Desk
 
-**Engine Writer** é um protótipo de aplicativo/engine de escrita em **Unity + C#** para autores de webnovel. A proposta é transformar a sessão de escrita em uma pequena operação estratégica: escrever alimenta um mapa em relevo, o rádio entrega missões, e dois agentes locais — **Builder** e **Critic** — mantêm um ciclo leve de melhoria sem tirar o autor do fluxo.
+Engine Writer é uma engine de escrita para webnovels que combina uma **mesa de escrita calma** com um **mundo militar vivo em 1944**. A regra de produto é simples: quando você quer escrever, o texto domina; quando quer brincar com o cenário, o mapa vira a mesa principal.
 
-## Conceito
+## World Desk preview
 
-- Tema visual original inspirado em pôsteres comerciais e ilustração editorial do século XX, com clima de 1944, espionagem e comunicação por rádio.
-- Mapas alternáveis entre visão **2D tática** e **3D em relevo low-poly**.
-- Simulação de quatro frentes/lane-based, inspirada na sensação de jogos de tabuleiro/cartas por terreno, sem copiar personagens, assets ou regras proprietárias.
-- Editor de capítulo com autosave, contagem de palavras (e caracteres Han no perfil CN), análise de gancho/ritmo/diálogo/cliffhanger e exportação TXT/Markdown.
-- Perfis de ritmo para webnovels **CN / KR / EN**.
-- Loop de motivação: palavras -> Signal -> turnos do mapa -> rádio -> micro-missão -> recompensa de sessão.
+A versão atual roda em um HTML offline leve e possui um launcher Windows pequeno. Não exige Unity e não embute um runtime .NET de centenas de megabytes.
 
-## Abrir no Unity
+### WRITE DESK
 
-1. Instale **Unity 6.x** (o projeto foi preparado para a linha 6000.0).
-2. Abra esta pasta no Unity Hub como projeto existente.
-3. Aguarde a compilação.
-4. No menu do Unity, use **Engine Writer > Create / Refresh Demo Scene**.
-5. Abra `Assets/EngineWriter/Scenes/EngineWriter.unity` e pressione **Play**.
+- trilho de capítulos e autosave local;
+- perfis EN / CN / KR;
+- editor em papel amplo, sem dashboard agressivo;
+- `Testar capítulo`: no máximo três achados com evidência textual e sem reescrever a prosa;
+- `Ler`: modo leitor limpo para sentir o capítulo como leitor;
+- `Publicar`: exporta capítulo UTF-8 e manifesto local;
+- `Quiet Write`: reduz o mapa a uma presença visual discreta;
+- rádio ambiente procedural opcional.
 
-O bootstrap também tenta iniciar o app automaticamente em qualquer cena vazia durante Play Mode.
+### WORLD TABLE
 
-## Atalhos
+- mapa alternável entre tático 2D e relevo em perspectiva;
+- terreno com água, planície, floresta, terreno seco e elevação rochosa;
+- cidades, estradas e linha de frente calculada pela influência real das forças;
+- infantaria, blindados, artilharia e unidades de suprimento;
+- HP, moral, fadiga, munição, combustível e suprimento;
+- movimento afetado por terreno e clima;
+- combate, retirada, captura de cidades e destroços persistentes;
+- aviação com base, combustível, munição, missões CAP/recon/strike, retorno e combate aéreo;
+- clima dinâmico com visibilidade e penalidades de movimento/aviação;
+- produção de suprimento nas cidades e consumo logístico das unidades;
+- rádio de campo registrando eventos realmente produzidos pela simulação.
 
-- `Ctrl+S`: salvar sessão.
-- `F6`: executar o ciclo Critic -> Builder.
-- `F7`: alternar mapa 2D / 3D.
+Escrever não concede bônus artificiais às forças. A escrita só libera resumos discretos do que aconteceu no mundo; o resultado militar vem da simulação.
 
-## Estrutura
+## Download
 
-- `Assets/EngineWriter/Scripts/Core` — sessão, bootstrap e loop principal.
-- `Assets/EngineWriter/Scripts/World` — mapa em relevo, frentes e simulação.
-- `Assets/EngineWriter/Scripts/Agents` — CriticAgent + BuilderAgent.
-- `Assets/EngineWriter/Scripts/Webnovel` — análise e perfis CN/KR/EN.
-- `Assets/EngineWriter/Scripts/Persistence` — save/export JSON/TXT/MD.
-- `Assets/EngineWriter/Scripts/UI` — mesa de escrita, rádio, painéis e controles.
-- `Assets/EngineWriter/Editor` — criação automática da cena de demonstração.
+Abra a aba **Releases** e procure a release mais recente `Engine Writer World Desk`. O ZIP contém:
 
-## Filosofia do produto
+- `EngineWriter.exe` — launcher pequeno;
+- `EngineWriter.html` — aplicativo/simulação offline;
+- `README.md`.
 
-O escritor não deve sentir que está “preenchendo métricas”. O mapa e o rádio existem como feedback ambiental: pequenas consequências visuais, missões curtas e sinais de progresso. A crítica é opcional e condensada a poucas observações práticas.
+O launcher usa o Microsoft Edge instalado no Windows em modo aplicativo e, se não encontrar Edge, abre o HTML no navegador padrão.
+
+## Direção artística
+
+A interface usa uma direção original inspirada por comunicação militar de 1944, ilustração comercial/editorial do século XX, formas gráficas fortes e contraste de equipes. Não inclui assets, personagens ou arte proprietária de Team Fortress 2, Adventure Time/Card Wars, J.C. Leyendecker, Dean Cornwell ou Norman Rockwell.
+
+## Próximas prioridades
+
+1. elevar o relevo para WebGL/Three.js offline mantendo o pacote pequeno;
+2. logística por estrada/depósito em vez de distância simples;
+3. ordens operacionais e rotas editáveis;
+4. inteligência incompleta/fog of war;
+5. dano de veículos e aeronaves por subsistema;
+6. conectar lugares e acontecimentos do mapa ao contexto do capítulo sem transformar o editor em uma Story Bible.
 
 ## Licença
 
-MIT para o código deste repositório. Não inclui nem depende de assets de Team Fortress 2, Adventure Time/Card Wars ou obras de J.C. Leyendecker, Dean Cornwell e Norman Rockwell. As referências são apenas de direção de clima, composição e época; use arte original ou licenciada no produto final.
+MIT para o código original deste repositório.
