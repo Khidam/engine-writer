@@ -50,46 +50,41 @@ namespace PrinceTitan
         {
             vh.Clear();
             var r = GetPixelAdjustedRect();
-            AddQuad(vh, r, PrinceTitanTheme.Paper);
-
-            for (var i = 0; i < 12; i++)
-            {
-                var y = r.yMin + r.height * (i + .5f) / 12f;
-                AddLine(vh, new Vector2(r.xMin, y), new Vector2(r.xMax, y), 1f, new Color(.43f, .28f, .18f, i % 2 == 0 ? .035f : .018f));
-            }
-
-            AddCircle(vh, CanvasPosition(new Vector2(.88f, .85f)), Mathf.Min(r.width, r.height) * .16f,
-                PrinceTitanTheme.WithAlpha(new Color(1f, .76f, .33f), .08f), 40);
-            AddCircle(vh, CanvasPosition(new Vector2(.88f, .85f)), Mathf.Min(r.width, r.height) * .08f,
-                PrinceTitanTheme.WithAlpha(new Color(1f, .89f, .57f), .12f), 32);
-
+            // The HD cartographic plate is rendered underneath this graphic. This mesh is now
+            // reserved for live intelligence, so the atlas remains detailed instead of looking flat.
             DrawDistricts(vh);
             DrawInfluence(vh);
-            DrawWater(vh);
             DrawRoads(vh);
             DrawSites(vh);
             DrawMovers(vh);
             DrawFootprints(vh);
 
-            AddLine(vh, new Vector2(r.xMin + 6f, r.yMin + 6f), new Vector2(r.xMax - 6f, r.yMin + 6f), 2f, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperInk, .72f));
-            AddLine(vh, new Vector2(r.xMin + 6f, r.yMax - 6f), new Vector2(r.xMax - 6f, r.yMax - 6f), 2f, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperInk, .72f));
-            AddLine(vh, new Vector2(r.xMin + 6f, r.yMin + 6f), new Vector2(r.xMin + 6f, r.yMax - 6f), 2f, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperInk, .72f));
-            AddLine(vh, new Vector2(r.xMax - 6f, r.yMin + 6f), new Vector2(r.xMax - 6f, r.yMax - 6f), 2f, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperInk, .72f));
+            var border = PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperInk, .74f);
+            AddLine(vh, new Vector2(r.xMin + 7f, r.yMin + 7f), new Vector2(r.xMax - 7f, r.yMin + 7f), 2f, border);
+            AddLine(vh, new Vector2(r.xMin + 7f, r.yMax - 7f), new Vector2(r.xMax - 7f, r.yMax - 7f), 2f, border);
+            AddLine(vh, new Vector2(r.xMin + 7f, r.yMin + 7f), new Vector2(r.xMin + 7f, r.yMax - 7f), 2f, border);
+            AddLine(vh, new Vector2(r.xMax - 7f, r.yMin + 7f), new Vector2(r.xMax - 7f, r.yMax - 7f), 2f, border);
+
+            var corner = PrinceTitanTheme.WithAlpha(PrinceTitanTheme.MagentaDark, .72f);
+            AddLine(vh, new Vector2(r.xMin + 7f,r.yMax - 19f), new Vector2(r.xMin + 7f,r.yMax - 7f), 4f, corner);
+            AddLine(vh, new Vector2(r.xMin + 7f,r.yMax - 7f), new Vector2(r.xMin + 19f,r.yMax - 7f), 4f, corner);
+            AddLine(vh, new Vector2(r.xMax - 19f,r.yMin + 7f), new Vector2(r.xMax - 7f,r.yMin + 7f), 4f, corner);
+            AddLine(vh, new Vector2(r.xMax - 7f,r.yMin + 7f), new Vector2(r.xMax - 7f,r.yMin + 19f), 4f, corner);
         }
 
         private void DrawDistricts(VertexHelper vh)
         {
             var colors = new[]
             {
-                new Color(.51f,.28f,.39f,.11f), new Color(.35f,.48f,.52f,.10f),
-                new Color(.57f,.42f,.22f,.10f), new Color(.28f,.53f,.49f,.09f)
+                new Color(.51f,.18f,.39f,.045f), new Color(.25f,.43f,.52f,.040f),
+                new Color(.57f,.37f,.16f,.040f), new Color(.20f,.48f,.42f,.038f)
             };
             for (var i = 0; i < districts.Length; i++)
             {
                 var points = districts[i].Select(CanvasPosition).ToArray();
                 AddPolygon(vh, points, colors[i]);
                 for (var j = 0; j < points.Length; j++)
-                    AddLine(vh, points[j], points[(j + 1) % points.Length], 1.2f, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperInk, .34f));
+                    AddLine(vh, points[j], points[(j + 1) % points.Length], 1.2f, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperInk, .40f));
             }
         }
 

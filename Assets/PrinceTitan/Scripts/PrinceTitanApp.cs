@@ -1,9 +1,13 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace PrinceTitan
 {
@@ -32,6 +36,7 @@ namespace PrinceTitan
         private Text expandedSiteDetailText;
         private Text pauseButtonText;
         private Text speedButtonText;
+        private Text interactionStatusText;
         private AtlasGraphic compactAtlas;
         private AtlasGraphic expandedAtlas;
         private GameObject atlasOverlay;
@@ -40,6 +45,7 @@ namespace PrinceTitan
         private bool dirty;
         private float dirtyAge;
         private float visualClock;
+        private float inputWatchdog;
         private PowerKind? activeFilter;
         private readonly Queue<string> eventLines = new Queue<string>();
         private readonly List<SiteOverlayRef> siteOverlays = new List<SiteOverlayRef>();
@@ -58,6 +64,8 @@ namespace PrinceTitan
             Application.runInBackground = true;
             QualitySettings.vSyncCount = 1;
             Screen.fullScreenMode = FullScreenMode.Windowed;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             if (Screen.width < 1200 || Screen.height < 720) Screen.SetResolution(1600, 900, false);
         }
 
@@ -67,10 +75,12 @@ namespace PrinceTitan
             project = ProjectStore.LoadOrCreate();
             simulation = new WorldSimulation(project.world);
             simulation.EventRaised += OnWorldEvent;
+            UiFactory.Interaction += SetInteractionStatus;
             BuildInterface();
             LoadActiveChapter();
             SelectSite(WorldSeed.Sites[0]);
             OnWorldEvent(new WorldEvent("Atlas awake", "Aircraft, machines, houses and markets are now moving in real time.", "aurelia"));
+            StartCoroutine(ArmInteraction());
         }
 
         private void Update()
@@ -91,21 +101,56 @@ namespace PrinceTitan
                 if (dirtyAge >= 2.4f) SaveProject(false);
             }
 
+#if ENABLE_INPUT_SYSTEM
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                var control = keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed;
+                if (control && keyboard.sKey.wasPressedThisFrame) SaveProject(true);
+                if (control && keyboard.eKey.wasPressedThisFrame) ExportActiveChapter();
+                if (control && keyboard.nKey.wasPressedThisFrame) NewChapter();
+                if (keyboard.escapeKey.wasPressedThisFrame) CloseOverlays();
+            }
+#else
             var control = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
             if (control && Input.GetKeyDown(KeyCode.S)) SaveProject(true);
             if (control && Input.GetKeyDown(KeyCode.E)) ExportActiveChapter();
             if (control && Input.GetKeyDown(KeyCode.N)) NewChapter();
             if (Input.GetKeyDown(KeyCode.Escape)) CloseOverlays();
+#endif
+
+            inputWatchdog += Time.unscaledDeltaTime;
+            if (inputWatchdog >= 1f)
+            {
+                inputWatchdog = 0f;
+                if (EventSystem.current == null || EventSystem.current.currentInputModule == null)
+                {
+                    UiFactory.EnsureEventSystem();
+                    SetInteractionStatus("INPUT RESTORED — CLICK / TYPE");
+                }
+            }
         }
 
         private void OnApplicationFocus(bool focused)
         {
             if (!focused && project != null) SaveProject(false);
+            if (focused)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                StartCoroutine(ArmInteraction());
+            }
         }
 
         private void OnApplicationQuit()
         {
             if (project != null) SaveProject(false);
+        }
+
+        private void OnDestroy()
+        {
+            UiFactory.Interaction -= SetInteractionStatus;
+            if (simulation != null) simulation.EventRaised -= OnWorldEvent;
         }
 
         private void BuildInterface()
@@ -116,13 +161,24 @@ namespace PrinceTitan
             canvas = canvasObject.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.pixelPerfect = false;
+            canvas.sortingOrder = 100;
+            var canvasGroup = canvasObject.AddComponent<CanvasGroup>();
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.ignoreParentGroups = true;
+            var raycaster = canvasObject.GetComponent<GraphicRaycaster>();
+            raycaster.ignoreReversedGraphics = true;
+            raycaster.blockingObjects = GraphicRaycaster.BlockingObjects.None;
             var scaler = canvasObject.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = .55f;
 
-            UiFactory.Panel("Backdrop", canvas.transform, PrinceTitanTheme.Ink, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            UiFactory.Texture("HD Spy Operations Desk", canvas.transform, "PrinceTitan/spy_desk_hd", Color.white,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            UiFactory.Panel("Cinematic Grade", canvas.transform, new Color(.06f,.035f,.065f,.18f),
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             BuildTopBar();
             BuildChapterRail();
             BuildWritingDesk();
@@ -133,8 +189,10 @@ namespace PrinceTitan
 
         private void BuildTopBar()
         {
-            var bar = UiFactory.Panel("Top Bar", canvas.transform, PrinceTitanTheme.InkSoft,
+            var bar = UiFactory.Panel("Top Bar", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft, .94f),
                 new Vector2(0f,.93f), Vector2.one, Vector2.zero, Vector2.zero);
+            UiFactory.Shadow(bar, new Color(0f,0f,0f,.72f), 4f);
+            UiFactory.Outline(bar, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Brass,.36f), 1f);
             UiFactory.Rule("Magenta Rule", bar.transform, PrinceTitanTheme.Magenta,
                 new Vector2(0f,0f), new Vector2(1f,0f), Vector2.zero, new Vector2(0f,3f));
 
@@ -142,7 +200,7 @@ namespace PrinceTitan
             emblemRect.gameObject.AddComponent<PrinceEmblemGraphic>();
             UiFactory.Label("Brand", bar.transform, "PRINCE TITAN", 24, PrinceTitanTheme.Ivory, TextAnchor.MiddleLeft,
                 new Vector2(0f,0f), new Vector2(.25f,1f), new Vector2(91f,0f), Vector2.zero, FontStyle.Bold);
-            UiFactory.Label("Subtitle", bar.transform, "WRITER  /  LIVING ATLAS", 10, PrinceTitanTheme.Brass, TextAnchor.MiddleLeft,
+            UiFactory.Label("Subtitle", bar.transform, "CLASSIFIED WRITER  /  LIVING ATLAS", 10, PrinceTitanTheme.Brass, TextAnchor.MiddleLeft,
                 new Vector2(0f,0f), new Vector2(.25f,.52f), new Vector2(94f,0f), Vector2.zero, FontStyle.Bold);
 
             UiFactory.Button("Write Tab", bar.transform, "WRITE", PrinceTitanTheme.Magenta, PrinceTitanTheme.Ivory, CloseOverlays,
@@ -152,14 +210,19 @@ namespace PrinceTitan
             UiFactory.Button("Lineage Tab", bar.transform, "LINEAGES", PrinceTitanTheme.InkRaised, PrinceTitanTheme.Ivory, OpenLineages,
                 new Vector2(.53f,.18f), new Vector2(.63f,.82f), Vector2.zero, Vector2.zero, 12);
 
-            UiFactory.Label("Shortcuts", bar.transform, "CTRL+S  SAVE   •   CTRL+E  EXPORT   •   CTRL+N  NEW CHAPTER", 10,
-                PrinceTitanTheme.Muted, TextAnchor.MiddleRight, new Vector2(.65f,0f), new Vector2(.98f,1f), Vector2.zero, Vector2.zero);
+            interactionStatusText = UiFactory.Label("Interaction Status", bar.transform, "●  ARMING INPUT", 10,
+                PrinceTitanTheme.Brass, TextAnchor.MiddleLeft, new Vector2(.65f,.18f), new Vector2(.81f,.82f), Vector2.zero, Vector2.zero, FontStyle.Bold);
+            UiFactory.Label("Shortcuts", bar.transform, "CTRL+S  •  CTRL+E  •  CTRL+N", 9,
+                PrinceTitanTheme.Muted, TextAnchor.MiddleRight, new Vector2(.81f,0f), new Vector2(.98f,1f), Vector2.zero, Vector2.zero);
         }
 
         private void BuildChapterRail()
         {
-            var rail = UiFactory.Panel("Chapter Rail", canvas.transform, PrinceTitanTheme.InkSoft,
+            var rail = UiFactory.Panel("Chapter Rail", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft, .84f),
                 new Vector2(0f,0f), new Vector2(.16f,.93f), Vector2.zero, new Vector2(-2f,0f));
+            UiFactory.Outline(rail, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta,.42f), 1f);
+            UiFactory.Rule("Rail Accent", rail.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta,.75f),
+                new Vector2(1f,0f), new Vector2(1f,1f), new Vector2(-2f,0f), Vector2.zero);
             UiFactory.Label("Project Label", rail.transform, "PROJECT", 10, PrinceTitanTheme.Brass, TextAnchor.MiddleLeft,
                 new Vector2(.07f,.905f), new Vector2(.93f,.95f), Vector2.zero, Vector2.zero, FontStyle.Bold);
             projectNameInput = UiFactory.Input("Project Name", rail.transform, project.projectName, "Project name", 15,
@@ -185,19 +248,23 @@ namespace PrinceTitan
 
         private void BuildWritingDesk()
         {
-            var desk = UiFactory.Panel("Writing Desk", canvas.transform, PrinceTitanTheme.Ivory,
+            var desk = UiFactory.Panel("Writing Desk", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Ivory, .88f),
                 new Vector2(.16f,0f), new Vector2(.685f,.93f), new Vector2(2f,0f), new Vector2(-2f,0f));
+            UiFactory.Shadow(desk, new Color(0f,0f,0f,.62f), 5f);
+            UiFactory.Outline(desk, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Brass,.62f), 1f);
+            UiFactory.Panel("Paper Bloom", desk.transform, new Color(1f,.97f,.90f,.22f),
+                new Vector2(.025f,.02f), new Vector2(.975f,.98f), Vector2.zero, Vector2.zero);
             UiFactory.Label("Desk Eyebrow", desk.transform, "MANUSCRIPT  /  ACTIVE CHAPTER", 10, PrinceTitanTheme.Magenta, TextAnchor.MiddleLeft,
                 new Vector2(.05f,.925f), new Vector2(.70f,.975f), Vector2.zero, Vector2.zero, FontStyle.Bold);
             wordCountText = UiFactory.Label("Word Count", desk.transform, "0 WORDS", 10, PrinceTitanTheme.PaperInk, TextAnchor.MiddleRight,
                 new Vector2(.70f,.925f), new Vector2(.95f,.975f), Vector2.zero, Vector2.zero, FontStyle.Bold);
             titleInput = UiFactory.Input("Chapter Title", desk.transform, string.Empty, "Chapter title", 23,
-                PrinceTitanTheme.Ivory, PrinceTitanTheme.Ink, new Vector2(.045f,.85f), new Vector2(.955f,.925f), Vector2.zero, Vector2.zero, false);
+                new Color(1f,.98f,.94f,.68f), PrinceTitanTheme.Ink, new Vector2(.045f,.85f), new Vector2(.955f,.925f), Vector2.zero, Vector2.zero, false);
             UiFactory.Rule("Title Rule", desk.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta, .35f),
                 new Vector2(.05f,.845f), new Vector2(.95f,.845f), Vector2.zero, new Vector2(0f,1f));
 
             bodyInput = UiFactory.Input("Chapter Body", desk.transform, string.Empty,
-                "Write the scene. The atlas will keep breathing beside you.", 18, PrinceTitanTheme.Ivory, PrinceTitanTheme.Ink,
+                "Write the scene. The atlas will keep breathing beside you.", 18, new Color(1f,.98f,.94f,.62f), PrinceTitanTheme.Ink,
                 new Vector2(.04f,.075f), new Vector2(.96f,.835f), Vector2.zero, Vector2.zero, true);
             bodyInput.textComponent.lineSpacing = 1.18f;
             bodyInput.characterLimit = 0;
@@ -215,8 +282,9 @@ namespace PrinceTitan
 
         private void BuildCompactAtlas()
         {
-            var panel = UiFactory.Panel("Atlas Side", canvas.transform, PrinceTitanTheme.InkSoft,
+            var panel = UiFactory.Panel("Atlas Side", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft, .82f),
                 new Vector2(.685f,0f), new Vector2(1f,.93f), new Vector2(2f,0f), Vector2.zero);
+            UiFactory.Outline(panel, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta,.50f), 1f);
             UiFactory.Label("Atlas Title", panel.transform, "THE LIVING ATLAS", 17, PrinceTitanTheme.Ivory, TextAnchor.MiddleLeft,
                 new Vector2(.05f,.93f), new Vector2(.57f,.99f), Vector2.zero, Vector2.zero, FontStyle.Bold);
             clockText = UiFactory.Label("Clock", panel.transform, "DAY 128  •  08:30", 10, PrinceTitanTheme.Brass, TextAnchor.MiddleRight,
@@ -224,7 +292,15 @@ namespace PrinceTitan
             BuildSimulationControls(panel.transform);
             BuildFilterRow(panel.transform, .87f, .915f);
 
-            var mapRect = UiFactory.Rect("Compact Map", panel.transform, new Vector2(.035f,.32f), new Vector2(.965f,.865f), Vector2.zero, Vector2.zero);
+            var mapFrame = UiFactory.Panel("Compact Map Frame", panel.transform, PrinceTitanTheme.PaperInk,
+                new Vector2(.035f,.32f), new Vector2(.965f,.865f), Vector2.zero, Vector2.zero);
+            mapFrame.gameObject.AddComponent<RectMask2D>();
+            UiFactory.Shadow(mapFrame, new Color(0f,0f,0f,.72f), 4f);
+            UiFactory.Outline(mapFrame, PrinceTitanTheme.Brass, 2f);
+            UiFactory.Texture("Compact Atlas HD", mapFrame.transform, "PrinceTitan/living_atlas_hd", Color.white,
+                Vector2.zero, Vector2.one, new Vector2(3f,3f), new Vector2(-3f,-3f));
+            var mapRect = UiFactory.Rect("Compact Map Interaction", mapFrame.transform, Vector2.zero, Vector2.one,
+                new Vector2(3f,3f), new Vector2(-3f,-3f));
             compactAtlas = mapRect.gameObject.AddComponent<AtlasGraphic>();
             compactAtlas.Bind(project.world);
             CreateSiteOverlays(mapRect, false);
@@ -270,8 +346,14 @@ namespace PrinceTitan
 
         private void BuildAtlasOverlay()
         {
-            atlasOverlay = UiFactory.Panel("Expanded Atlas Overlay", canvas.transform, new Color(.055f,.047f,.06f,.995f),
-                new Vector2(0f,0f), new Vector2(1f,.93f), Vector2.zero, Vector2.zero).gameObject;
+            var overlayImage = UiFactory.Panel("Expanded Atlas Overlay", canvas.transform, new Color(.055f,.047f,.06f,1f),
+                new Vector2(0f,0f), new Vector2(1f,.93f), Vector2.zero, Vector2.zero);
+            overlayImage.raycastTarget = true;
+            atlasOverlay = overlayImage.gameObject;
+            UiFactory.Texture("Atlas Operations Backdrop", atlasOverlay.transform, "PrinceTitan/spy_desk_hd", new Color(.78f,.70f,.78f,1f),
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            UiFactory.Panel("Atlas Night Glass", atlasOverlay.transform, new Color(.035f,.025f,.045f,.72f),
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             UiFactory.Label("Title", atlasOverlay.transform, "ATLAS OF INFLUENCE", 24, PrinceTitanTheme.Ivory, TextAnchor.MiddleLeft,
                 new Vector2(.025f,.91f), new Vector2(.45f,.985f), Vector2.zero, Vector2.zero, FontStyle.Bold);
             UiFactory.Label("Sub", atlasOverlay.transform, "Every house, market, company, machine and flight remains visible.", 11,
@@ -281,13 +363,20 @@ namespace PrinceTitan
 
             var mapFrame = UiFactory.Panel("Map Frame", atlasOverlay.transform, PrinceTitanTheme.PaperInk,
                 new Vector2(.025f,.055f), new Vector2(.735f,.865f), Vector2.zero, Vector2.zero);
+            mapFrame.gameObject.AddComponent<RectMask2D>();
+            UiFactory.Shadow(mapFrame, new Color(0f,0f,0f,.82f), 6f);
+            UiFactory.Outline(mapFrame, PrinceTitanTheme.Brass, 2f);
+            UiFactory.Texture("Living Atlas HD", mapFrame.transform, "PrinceTitan/living_atlas_hd", Color.white,
+                Vector2.zero, Vector2.one, new Vector2(4f,4f), new Vector2(-4f,-4f));
             var mapRect = UiFactory.Rect("Large Map", mapFrame.transform, Vector2.zero, Vector2.one, new Vector2(4f,4f), new Vector2(-4f,-4f));
             expandedAtlas = mapRect.gameObject.AddComponent<AtlasGraphic>();
             expandedAtlas.Bind(project.world);
             CreateSiteOverlays(mapRect, true);
 
-            var right = UiFactory.Panel("Atlas Ledger", atlasOverlay.transform, PrinceTitanTheme.InkSoft,
+            var right = UiFactory.Panel("Atlas Ledger", atlasOverlay.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft,.94f),
                 new Vector2(.755f,.055f), new Vector2(.975f,.865f), Vector2.zero, Vector2.zero);
+            UiFactory.Shadow(right, new Color(0f,0f,0f,.74f), 4f);
+            UiFactory.Outline(right, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta,.58f), 1f);
             UiFactory.Label("Power Label", right.transform, "FOUR POWERS", 11, PrinceTitanTheme.Magenta, TextAnchor.MiddleLeft,
                 new Vector2(.07f,.91f), new Vector2(.93f,.97f), Vector2.zero, Vector2.zero, FontStyle.Bold);
             var y = .83f;
@@ -314,8 +403,14 @@ namespace PrinceTitan
 
         private void BuildLineageOverlay()
         {
-            lineageOverlay = UiFactory.Panel("Lineage Overlay", canvas.transform, new Color(.055f,.047f,.06f,.995f),
-                new Vector2(0f,0f), new Vector2(1f,.93f), Vector2.zero, Vector2.zero).gameObject;
+            var overlayImage = UiFactory.Panel("Lineage Overlay", canvas.transform, new Color(.055f,.047f,.06f,1f),
+                new Vector2(0f,0f), new Vector2(1f,.93f), Vector2.zero, Vector2.zero);
+            overlayImage.raycastTarget = true;
+            lineageOverlay = overlayImage.gameObject;
+            UiFactory.Texture("Lineage Operations Backdrop", lineageOverlay.transform, "PrinceTitan/spy_desk_hd", new Color(.72f,.64f,.72f,1f),
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            UiFactory.Panel("Lineage Night Glass", lineageOverlay.transform, new Color(.035f,.025f,.045f,.76f),
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             UiFactory.Label("Title", lineageOverlay.transform, "BIOLOGICAL & POLITICAL LINEAGES", 24, PrinceTitanTheme.Ivory, TextAnchor.MiddleLeft,
                 new Vector2(.025f,.91f), new Vector2(.60f,.985f), Vector2.zero, Vector2.zero, FontStyle.Bold);
             UiFactory.Label("Sub", lineageOverlay.transform, "Origin, family, allegiance and every role a person has held.", 11,
@@ -325,6 +420,13 @@ namespace PrinceTitan
 
             var tree = UiFactory.Panel("Tree Paper", lineageOverlay.transform, PrinceTitanTheme.PaperLight,
                 new Vector2(.025f,.05f), new Vector2(.975f,.86f), Vector2.zero, Vector2.zero);
+            tree.gameObject.AddComponent<RectMask2D>();
+            UiFactory.Shadow(tree, new Color(0f,0f,0f,.82f), 6f);
+            UiFactory.Outline(tree, PrinceTitanTheme.Brass, 2f);
+            UiFactory.Texture("Cartographic Bloodline", tree.transform, "PrinceTitan/living_atlas_hd", new Color(1f,.92f,.80f,.20f),
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            UiFactory.Panel("Lineage Paper Veil", tree.transform, new Color(1f,.95f,.82f,.77f),
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             var connectionsRect = UiFactory.Rect("Connections", tree.transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             connectionsRect.gameObject.AddComponent<LineageConnectionsGraphic>();
             foreach (var person in WorldSeed.People) CreatePersonCard(tree.transform, person);
@@ -339,6 +441,8 @@ namespace PrinceTitan
             var faction = WorldSeed.Faction(person.factionId);
             var outer = UiFactory.Panel("Person " + person.id, parent, faction.Color,
                 person.treePosition, person.treePosition, new Vector2(-105f,-44f), new Vector2(105f,44f));
+            UiFactory.Shadow(outer, new Color(0f,0f,0f,.52f), 3f);
+            UiFactory.Outline(outer, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Ivory,.42f), 1f);
             var inner = UiFactory.Panel("Card", outer.transform, PrinceTitanTheme.InkSoft, Vector2.zero, Vector2.one, new Vector2(3f,3f), new Vector2(-3f,-3f));
             UiFactory.Label("Name", inner.transform, person.name.ToUpperInvariant(), 12, PrinceTitanTheme.Ivory, TextAnchor.MiddleLeft,
                 new Vector2(.06f,.58f), new Vector2(.94f,.92f), Vector2.zero, Vector2.zero, FontStyle.Bold);
@@ -355,9 +459,19 @@ namespace PrinceTitan
                 var captured = site;
                 var hit = UiFactory.Panel("Hit " + site.id, map, new Color(1f,1f,1f,.001f), site.position, site.position,
                     new Vector2(large ? -18f : -12f, large ? -18f : -12f), new Vector2(large ? 18f : 12f, large ? 18f : 12f));
+                hit.raycastTarget = true;
                 var button = hit.gameObject.AddComponent<Button>();
                 button.targetGraphic = hit;
                 button.onClick.AddListener(() => SelectSite(captured));
+                button.onClick.AddListener(() => UiFactory.Report("INTEL — " + captured.name.ToUpperInvariant()));
+                var colors = button.colors;
+                colors.normalColor = new Color(1f,1f,1f,.001f);
+                colors.highlightedColor = PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta,.30f);
+                colors.pressedColor = PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Brass,.64f);
+                colors.selectedColor = PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta,.22f);
+                colors.fadeDuration = .05f;
+                button.colors = colors;
+                hit.gameObject.AddComponent<PressFeedback>();
                 var label = UiFactory.Label("Label " + site.id, map, site.name, large ? 10 : 7,
                     PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperInk, .88f), TextAnchor.MiddleLeft,
                     site.position, site.position, new Vector2(large ? 14f : 9f, large ? -9f : -7f),
@@ -377,9 +491,12 @@ namespace PrinceTitan
                 var panel = UiFactory.Panel("Chapter " + chapter.id, chapterContent, active ? PrinceTitanTheme.InkRaised : PrinceTitanTheme.Ink,
                     Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero).rectTransform;
                 UiFactory.Layout(panel, 58f);
+                panel.GetComponent<Image>().raycastTarget = true;
                 var button = panel.gameObject.AddComponent<Button>();
                 button.targetGraphic = panel.GetComponent<Image>();
                 button.onClick.AddListener(() => SwitchChapter(captured.id));
+                button.onClick.AddListener(() => UiFactory.Report("CHAPTER — " + (string.IsNullOrWhiteSpace(captured.title) ? "UNTITLED" : captured.title.ToUpperInvariant())));
+                panel.gameObject.AddComponent<PressFeedback>();
                 UiFactory.Panel("Active", panel, active ? PrinceTitanTheme.Magenta : Color.clear,
                     new Vector2(0f,0f), new Vector2(0f,1f), Vector2.zero, new Vector2(4f,0f));
                 UiFactory.Label("Title", panel, string.IsNullOrWhiteSpace(chapter.title) ? "Untitled chapter" : chapter.title, 11,
@@ -583,22 +700,55 @@ namespace PrinceTitan
 
         private void OpenAtlas()
         {
+            if (bodyInput != null) bodyInput.DeactivateInputField();
             lineageOverlay.SetActive(false);
             atlasOverlay.SetActive(true);
             atlasOverlay.transform.SetAsLastSibling();
+            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
+            SetInteractionStatus("ATLAS ACTIVE — SELECT ANY MARKER");
         }
 
         private void OpenLineages()
         {
+            if (bodyInput != null) bodyInput.DeactivateInputField();
             atlasOverlay.SetActive(false);
             lineageOverlay.SetActive(true);
             lineageOverlay.transform.SetAsLastSibling();
+            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
+            SetInteractionStatus("LINEAGES ACTIVE — ORIGIN / ROLE / POWER");
         }
 
         private void CloseOverlays()
         {
             if (atlasOverlay != null) atlasOverlay.SetActive(false);
             if (lineageOverlay != null) lineageOverlay.SetActive(false);
+            if (bodyInput != null && bodyInput.gameObject.activeInHierarchy) StartCoroutine(ArmInteraction());
+        }
+
+        private IEnumerator ArmInteraction()
+        {
+            yield return null;
+            UiFactory.EnsureEventSystem();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            Canvas.ForceUpdateCanvases();
+            if ((atlasOverlay != null && atlasOverlay.activeSelf) || (lineageOverlay != null && lineageOverlay.activeSelf)) yield break;
+            if (bodyInput != null && bodyInput.gameObject.activeInHierarchy)
+            {
+                EventSystem.current.SetSelectedGameObject(bodyInput.gameObject);
+                bodyInput.ActivateInputField();
+                bodyInput.MoveTextEnd(false);
+            }
+            SetInteractionStatus("INPUT ONLINE — CLICK / TYPE");
+        }
+
+        private void SetInteractionStatus(string message)
+        {
+            if (interactionStatusText == null) return;
+            interactionStatusText.text = "●  " + message;
+            interactionStatusText.color = message.IndexOf("RESTORED", StringComparison.OrdinalIgnoreCase) >= 0
+                ? PrinceTitanTheme.Brass
+                : PrinceTitanTheme.Success;
         }
     }
 }

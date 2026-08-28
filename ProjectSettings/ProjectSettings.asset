@@ -207,6 +207,7 @@ PlayerSettings:
   scriptingRuntimeVersion: 1
   gcIncremental: 1
   gcWBarrierValidation: 0
+  activeInputHandler: 2
   apiCompatibilityLevelPerPlatform:
     Standalone: 3
   m_RenderingPath: 1

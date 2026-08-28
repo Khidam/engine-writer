@@ -99,4 +99,4 @@ jobs:
             --repo "${{ github.repository }}" \
             --target "${{ github.sha }}" \
             --title "Prince Titan v0.1.${{ github.run_number }}" \
-            --notes "Unity Windows x64 preview. Download the ZIP, extract it, and double-click PrinceTitan.exe. Includes the manuscript editor, local autosave/export, living influence atlas, moving aircraft and robot traffic, markets, estates, companies, and the biological/political lineage tree."
+            --notes "Prince Titan Unity Windows x64. Interaction repair: modern mouse/keyboard input module, focus watchdog, visible hover/press feedback, and INPUT ONLINE status. Visual rebuild: original HD espionage command desk plus a detailed sunlit parchment atlas, with live influence, aircraft, robots, markets, estates, companies, and biological/political lineages. Download the ZIP, extract it, and double-click PrinceTitan.exe."

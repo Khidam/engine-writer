@@ -7,7 +7,9 @@
 - editor de capítulos com título, contagem de palavras e atalhos;
 - autosave local em JSON e backup automático;
 - exportação do capítulo ativo em UTF-8 `.txt`;
-- mapa lateral e atlas expandido desenhados proceduralmente pelo Unity;
+- interface Unity redesenhada como uma mesa de operações de espionagem, com materiais escuros, marfim, latão e magenta;
+- duas placas de arte HD originais: mesa de escrita secreta e atlas cartográfico vivo em pergaminho;
+- mapa lateral e atlas expandido com arte cartográfica HD e uma camada procedural de inteligência em tempo real;
 - 14 lugares visíveis: cidades, mercados, empresas, casas, porto, aeródromo, relé e fábricas de robôs;
 - aviões em rotas contínuas e um transporte robótico em movimento;
 - atividade dos mercados, relógio mundial e eventos ambientes;
@@ -15,10 +17,11 @@
 - filtros por poder sem esconder permanentemente nenhum dado;
 - árvore biológica e política com nome, família, origem, nascimento, função e aliança de cada pessoa;
 - simulação independente da escrita: escrever nunca altera artificialmente quem vence o mapa.
+- entrada moderna e redundante para mouse/teclado, com foco automático, estados de hover/pressionado e indicador `INPUT ONLINE`;
 
 ## Direção visual
 
-A identidade é original: espionagem editorial de meados do século, cartões de inteligência, carvão, branco marfim, magenta e latão. O mapa mistura papel aquecido pelo sol, tinta, rotas pontilhadas e movimento discreto. As imagens de referência serviram apenas para definir clima e composição; nenhum asset, personagem, arma, logotipo ou interface proprietária foi copiado.
+A identidade é original: espionagem editorial de meados do século, cartões de inteligência, carvão, branco marfim, magenta e latão. O mapa mistura papel aquecido pelo sol, tinta gravada, cidades, ferrovias, portos, indústria, rotas pontilhadas e movimento discreto. As imagens de referência serviram apenas para definir clima e composição; nenhum asset, personagem, arma, logotipo ou interface proprietária foi copiado.
 
 ## Baixar e abrir rapidamente
 
@@ -37,7 +40,7 @@ O GitHub Actions precisa ativar a sua licença Unity Personal uma única vez. Ad
 - `UNITY_EMAIL`: e-mail da conta Unity;
 - `UNITY_PASSWORD`: senha da conta Unity.
 
-Depois abra **Actions → Prince Titan Unity Windows Release → Run workflow**. O workflow compila no servidor e cria a release com o ZIP automaticamente. Nunca coloque a senha em arquivo do repositório, issue ou conversa.
+Depois abra **Actions → Prince Titan Unity Windows Release → Run workflow**. O workflow compila no servidor e cria a release com o ZIP automaticamente. Nunca coloque senha ou licença em arquivo do repositório, issue ou conversa.
 
 ## Dados locais
 
