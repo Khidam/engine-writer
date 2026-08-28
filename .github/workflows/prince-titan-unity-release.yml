@@ -75,10 +75,11 @@ jobs:
         shell: bash
         run: |
           test -f build/StandaloneWindows64/PrinceTitan.exe
-          cp README.md build/StandaloneWindows64/README.txt
+          cp README.md PrinceTitan-README.txt
           cd build/StandaloneWindows64
           zip -9 -r ../../PrinceTitan-Windows-x64.zip .
           cd ../..
+          zip -9 -j PrinceTitan-Windows-x64.zip PrinceTitan-README.txt
           ls -lh PrinceTitan-Windows-x64.zip build/StandaloneWindows64/PrinceTitan.exe
 
       - name: Keep downloadable Actions artifact
