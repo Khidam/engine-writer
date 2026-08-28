@@ -60,7 +60,8 @@ namespace PrinceTitan.Editor
         {
             PlayerSettings.companyName = "Khidam";
             PlayerSettings.productName = "Prince Titan";
-            PlayerSettings.bundleVersion = "0.3.0";
+            PlayerSettings.bundleVersion = "0.4.0";
+            PlayerSettings.colorSpace = ColorSpace.Linear;
             PlayerSettings.defaultScreenWidth = 1600;
             PlayerSettings.defaultScreenHeight = 900;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;

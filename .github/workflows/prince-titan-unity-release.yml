@@ -79,8 +79,8 @@ jobs:
           extracted_bytes=$(du -sb build/StandaloneWindows64 | cut -f1)
           extracted_megabytes=$((extracted_bytes / 1024 / 1024))
           echo "Extracted application size: ${extracted_megabytes} MB"
-          if [ "$extracted_megabytes" -lt 180 ]; then
-            echo "::error::The rebuilt application is missing its full-resolution cinematic rooms (${extracted_megabytes} MB found)."
+          if [ "$extracted_megabytes" -lt 200 ]; then
+            echo "::error::The rebuilt application is missing its complete functional QHD archive (${extracted_megabytes} MiB found; at least 200 MiB required)."
             exit 1
           fi
           cp README.md PrinceTitan-README.txt
@@ -88,13 +88,16 @@ jobs:
           zip -9 -r ../../PrinceTitan-Windows-x64.zip .
           cd ../..
           zip -9 -j PrinceTitan-Windows-x64.zip PrinceTitan-README.txt
+          sha256sum PrinceTitan-Windows-x64.zip > PrinceTitan-Windows-x64.sha256
           ls -lh PrinceTitan-Windows-x64.zip build/StandaloneWindows64/PrinceTitan.exe
 
       - name: Keep downloadable Actions artifact
         uses: actions/upload-artifact@v4
         with:
           name: PrinceTitan-Windows-x64
-          path: PrinceTitan-Windows-x64.zip
+          path: |
+            PrinceTitan-Windows-x64.zip
+            PrinceTitan-Windows-x64.sha256
           if-no-files-found: error
 
       - name: Publish GitHub Release
@@ -102,9 +105,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="prince-titan-v0.1.${{ github.run_number }}"
-          gh release create "$tag" PrinceTitan-Windows-x64.zip \
+          tag="prince-titan-v0.4.${{ github.run_number }}"
+          gh release create "$tag" PrinceTitan-Windows-x64.zip PrinceTitan-Windows-x64.sha256 \
             --repo "${{ github.repository }}" \
             --target "${{ github.sha }}" \
-            --title "Prince Titan v0.1.${{ github.run_number }}" \
-            --notes "Prince Titan 0.3 — reconstrução completa em Unity para Windows x64. Seis salas independentes com tipografia grande e escala de 100–175%; Sala de Comando cinematográfica; Mapa Vivo em tela ampla com zoom, arraste, aeronaves, Titãs, lugares e influência; máquina física de escrita; árvore de pessoas e famílias; quatro poderes com regiões próprias; economia com mercados, companhias, casas, portos e fábricas; criação de pessoas e lugares; simulação, ambiente sonoro, autosave e exportação. Baixe o ZIP, extraia e abra PrinceTitan.exe."
+            --title "Prince Titan v0.4.${{ github.run_number }}" \
+            --notes "Prince Titan 0.4 — reconstrução nativa em Unity para Windows x64. Bunker de espionagem 1944; simulação de relevo 3D com câmera orbital; Mundo Real e Dimensão Quebrada; casas, hangares, aviões de hélice, robôs e Titã humanoide em miniatura; operações com origem, destino, rota, objetivo e ETA; eventos persistentes na chegada; dossiê de escrita; Torre de Troia; gravações mecânicas; dano por peça; exclusão confirmada de capítulos e exclusão recuperável de projetos; onze chapas QHD funcionais e fonte grande. Não há categoria Poderes nem influência. Baixe o ZIP, extraia tudo e abra PrinceTitan.exe."

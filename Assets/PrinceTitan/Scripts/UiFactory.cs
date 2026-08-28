@@ -60,7 +60,7 @@ namespace PrinceTitan
             var label = rect.gameObject.AddComponent<Text>();
             label.font = PrinceTitanTheme.Font;
             label.text = value;
-            label.fontSize = Mathf.Max(15, size);
+            label.fontSize = Mathf.Max(17, size);
             label.color = color;
             label.alignment = alignment;
             label.fontStyle = style;
@@ -95,11 +95,11 @@ namespace PrinceTitan
             image.gameObject.AddComponent<ButtonMotion>();
             if (action != null) button.onClick.AddListener(action);
             button.onClick.AddListener(() => Report(caption));
-            var label = Label("Caption", image.transform, caption, Mathf.Max(17, fontSize), foreground, TextAnchor.MiddleCenter,
+            var label = Label("Caption", image.transform, caption, Mathf.Max(18, fontSize), foreground, TextAnchor.MiddleCenter,
                 Vector2.zero, Vector2.one, new Vector2(10f, 5f), new Vector2(-10f, -5f), FontStyle.Bold);
             label.resizeTextForBestFit = true;
-            label.resizeTextMinSize = 15;
-            label.resizeTextMaxSize = Mathf.Max(17, fontSize);
+            label.resizeTextMinSize = 17;
+            label.resizeTextMaxSize = Mathf.Max(18, fontSize);
             return button;
         }
 
@@ -113,11 +113,11 @@ namespace PrinceTitan
             field.lineType = multiline ? InputField.LineType.MultiLineNewline : InputField.LineType.SingleLine;
             field.navigation = new Navigation { mode = Navigation.Mode.Automatic };
             var pad = multiline ? new Vector2(20f, 16f) : new Vector2(16f, 6f);
-            field.textComponent = Label("Text", image.transform, value, Mathf.Max(18, fontSize), foreground,
+            field.textComponent = Label("Text", image.transform, value, Mathf.Max(20, fontSize), foreground,
                 multiline ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft, Vector2.zero, Vector2.one,
                 pad, -pad);
             field.textComponent.supportRichText = false;
-            field.placeholder = Label("Placeholder", image.transform, placeholder, Mathf.Max(18, fontSize),
+            field.placeholder = Label("Placeholder", image.transform, placeholder, Mathf.Max(20, fontSize),
                 PrinceTitanTheme.WithAlpha(foreground, .44f), multiline ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft,
                 Vector2.zero, Vector2.one, pad, -pad, FontStyle.Italic);
             field.text = value;
