@@ -41,6 +41,6 @@ Projetos e exports ficam em **AppData/LocalLow/Khidam/Prince Titan/PrinceTitan**
 
 ## Build automático
 
-O GitHub Actions usa Unity 2022.3.62f1 para montar Windows x64, validar `PrinceTitan.exe`, conferir os dados do jogador e exigir pelo menos 200 MiB extraídos de conteúdo funcional antes de publicar a Release. As onze chapas QHD são usadas nas salas e nos registros; não há arquivo de preenchimento.
+O GitHub Actions usa Unity 2022.3.62f1 para montar Windows x64, validar `PrinceTitan.exe`, conferir os dados do jogador e exigir pelo menos 200 MiB extraídos de conteúdo funcional antes de publicar a Release. As catorze chapas QHD são usadas nas salas e nos registros; não há arquivo de preenchimento.
 
 Licença MIT para o código original. Fontes DejaVu sob a licença Bitstream Vera; consulte [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

@@ -463,10 +463,12 @@ namespace PrinceTitan
         private static string SitePlate(SiteData site)
         {
             if(site==null)return"PrinceTitan/Scenes/war_archive_1944_qhd";
+            if(site.id=="forge-district")return"PrinceTitan/Scenes/nanomancer_forge_awakening_qhd";
             if(site.kind==SiteKind.Arena)return"PrinceTitan/Scenes/arena_ring_1944_qhd";
             if(site.kind==SiteKind.Airfield)return"PrinceTitan/Scenes/aircraft_hangar_1944_qhd";
             if(site.kind==SiteKind.Forest||site.realm==RealmLayer.BrokenDimension)return"PrinceTitan/Scenes/broken_dimension_forest_qhd";
-            if(site.kind==SiteKind.Rift||site.kind==SiteKind.Relay)return"PrinceTitan/Scenes/rift_battle_1944_qhd";
+            if(site.kind==SiteKind.Relay)return"PrinceTitan/Scenes/missile_interception_briefing_qhd";
+            if(site.kind==SiteKind.Rift)return"PrinceTitan/Scenes/rift_battle_1944_qhd";
             if(site.kind==SiteKind.RobotWorks)return"PrinceTitan/Scenes/giant_robot_blueprint_qhd";
             if(site.id=="titan-route")return"PrinceTitan/Scenes/titan_tower_formation_qhd";
             return"PrinceTitan/Scenes/war_archive_1944_qhd";
@@ -476,7 +478,7 @@ namespace PrinceTitan
         {
             if(recording==null)return"PrinceTitan/Scenes/war_archive_1944_qhd";
             if(recording.id=="rec-ring")return"PrinceTitan/Scenes/arena_ring_1944_qhd";
-            if(recording.id=="rec-giant")return"PrinceTitan/Scenes/rift_battle_1944_qhd";
+            if(recording.id=="rec-giant")return"PrinceTitan/Scenes/robot_maintenance_cutaway_qhd";
             if(recording.id=="rec-titan")return"PrinceTitan/Scenes/titan_tower_formation_qhd";
             return"PrinceTitan/Scenes/war_archive_1944_qhd";
         }

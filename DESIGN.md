@@ -11,7 +11,7 @@ Prince Titan é uma central de espionagem para observar uma história em movimen
 5. **Duas realidades:** Mundo Real e Dimensão Quebrada têm relevo e regras visuais próprias.
 6. **Escrever continua central:** capítulos, contexto de cena, autosave, backup, exportação e exclusão recuperável ficam acessíveis sem abrir o Unity.
 7. **Legibilidade:** corpo interativo mínimo de 17 pontos e escala de interface até 175%.
-8. **Conteúdo determina o tamanho:** onze chapas QHD diferentes são usadas por salas e registros, além da simulação procedural; não existem arquivos de preenchimento.
+8. **Conteúdo determina o tamanho:** catorze chapas QHD diferentes são usadas por salas e registros, além da simulação procedural; não existem arquivos de preenchimento.
 
 ## Salas
 

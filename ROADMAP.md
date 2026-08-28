@@ -15,7 +15,7 @@
 - organização, linhagens, habilidades e formação Torre de Troia;
 - arquivo de máquinas, organizações, lugares e gravações;
 - dano persistente por parte da máquina e representação no relevo;
-- onze chapas QHD funcionais e duas fontes DejaVu locais;
+- catorze chapas QHD funcionais e duas fontes DejaVu locais;
 - interface de 100–175% e corpo interativo mínimo de 17 pontos;
 - build e Release Windows automáticos com verificação de pelo menos 200 MiB extraídos.
 
