@@ -11,14 +11,14 @@ namespace PrinceTitan
 
         private readonly WorldEvent[] events =
         {
-            new WorldEvent("Flight observed", "A pale reconnaissance aircraft crossed White Noon without descending.", "assembly"),
-            new WorldEvent("Market opens", "Saffron Steps raised its canvas awnings; medicine prices are easing.", "emberline"),
-            new WorldEvent("Titan transfer", "Aurelia Works registered a heavy frame moving west toward Ferrous Yard.", "aurelia"),
-            new WorldEvent("Estate lights", "Every southern window of Mirador House lit at the same hour.", "vesper"),
-            new WorldEvent("Quiet contract", "A shipping company changed ownership at the Contract Exchange.", "aurelia"),
-            new WorldEvent("Family arrival", "Two Ember-Sol couriers reached Vale Houses before the evening tram.", "emberline"),
-            new WorldEvent("Government notice", "Glass Harbor reopened its eastern ferry lane.", "assembly"),
-            new WorldEvent("Foundry bell", "Ferrous Yard completed another Titan shoulder assembly.", "vesper")
+            new WorldEvent("Voo observado", "Uma aeronave de reconhecimento cruzou Meio-Dia Branco sem pousar.", "assembly"),
+            new WorldEvent("Mercado aberto", "Os toldos dos Degraus de Açafrão subiram; remédios estão mais baratos.", "emberline"),
+            new WorldEvent("Transferência Titan", "Aurelia registrou uma estrutura pesada seguindo para o Pátio Ferrous.", "aurelia"),
+            new WorldEvent("Luzes na propriedade", "Todas as janelas do sul da Casa Mirador acenderam ao mesmo tempo.", "vesper"),
+            new WorldEvent("Contrato silencioso", "Uma companhia de navegação mudou de mãos na Bolsa de Contratos.", "aurelia"),
+            new WorldEvent("Chegada familiar", "Dois mensageiros Ember-Sol alcançaram as Casas do Vale antes do bonde.", "emberline"),
+            new WorldEvent("Comunicado oficial", "O Porto de Vidro reabriu a rota de balsas do leste.", "assembly"),
+            new WorldEvent("Sino da fundição", "O Pátio Ferrous terminou o ombro de um novo Titan.", "vesper")
         };
 
         public event Action<WorldEvent> EventRaised;
@@ -81,7 +81,7 @@ namespace PrinceTitan
         public string ClockText()
         {
             var total = Mathf.FloorToInt(state.minuteOfDay);
-            return "DAY " + state.day.ToString("000") + "  •  " + (total / 60).ToString("00") + ":" + (total % 60).ToString("00");
+            return "DIA " + state.day.ToString("000") + "  ·  " + (total / 60).ToString("00") + ":" + (total % 60).ToString("00");
         }
     }
 }

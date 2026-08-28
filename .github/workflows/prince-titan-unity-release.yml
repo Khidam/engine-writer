@@ -75,6 +75,14 @@ jobs:
         shell: bash
         run: |
           test -f build/StandaloneWindows64/PrinceTitan.exe
+          test -f build/StandaloneWindows64/PrinceTitan_Data/resources.assets
+          extracted_bytes=$(du -sb build/StandaloneWindows64 | cut -f1)
+          extracted_megabytes=$((extracted_bytes / 1024 / 1024))
+          echo "Extracted application size: ${extracted_megabytes} MB"
+          if [ "$extracted_megabytes" -lt 180 ]; then
+            echo "::error::The rebuilt application is missing its full-resolution cinematic rooms (${extracted_megabytes} MB found)."
+            exit 1
+          fi
           cp README.md PrinceTitan-README.txt
           cd build/StandaloneWindows64
           zip -9 -r ../../PrinceTitan-Windows-x64.zip .
@@ -99,4 +107,4 @@ jobs:
             --repo "${{ github.repository }}" \
             --target "${{ github.sha }}" \
             --title "Prince Titan v0.1.${{ github.run_number }}" \
-            --notes "Prince Titan Unity Windows x64. Interaction repair: modern mouse/keyboard input module, focus watchdog, visible hover/press feedback, and INPUT ONLINE status. Visual rebuild: original HD espionage command desk plus a detailed sunlit parchment atlas, with live influence, aircraft, robots, markets, estates, companies, and biological/political lineages. Download the ZIP, extract it, and double-click PrinceTitan.exe."
+            --notes "Prince Titan 0.3 — reconstrução completa em Unity para Windows x64. Seis salas independentes com tipografia grande e escala de 100–175%; Sala de Comando cinematográfica; Mapa Vivo em tela ampla com zoom, arraste, aeronaves, Titãs, lugares e influência; máquina física de escrita; árvore de pessoas e famílias; quatro poderes com regiões próprias; economia com mercados, companhias, casas, portos e fábricas; criação de pessoas e lugares; simulação, ambiente sonoro, autosave e exportação. Baixe o ZIP, extraia e abra PrinceTitan.exe."

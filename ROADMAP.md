@@ -1,31 +1,24 @@
-# Prince Titan Roadmap
+# Prince Titan — estado da reconstrução
 
-## v0.1 — Unity living desk
+## Entrega 0.3
 
-- editor de capítulos, autosave, backup e exportação;
-- mapa compacto e atlas expandido;
-- quatro poderes e 14 lugares;
-- aviação, robô, mercados e relógio ambientes;
-- árvore biológica/política;
-- release automática Windows x64.
+- seis salas nativas em Unity;
+- interface responsiva e escala de 100–175%;
+- catorze cenas QHD exclusivas;
+- observatórios próprios de aviação, Titãs, mercados e casas/companhias;
+- Mapa Vivo com zoom, arraste, filtros, lugares e unidades móveis;
+- quatro poderes, influência e regiões próprias;
+- árvore biológica e política;
+- mercados, companhias e casas;
+- criação de pessoas e lugares;
+- capítulos, autosave e exportação;
+- exportação do dossiê do mundo;
+- ambiente sonoro opcional;
+- build Windows e Release automáticos.
 
-## v0.2 — World authoring
+## Próxima camada
 
-- criar, editar e remover pessoas, famílias, lugares e poderes pelo aplicativo;
-- desenhar novas estradas e rotas diretamente no mapa;
-- histórico de empregos, títulos e mudanças de aliança;
-- cadastro completo de robôs: altura, dano por parte, origem, comprador e sucata persistente.
-
-## v0.3 — Manuscript intelligence
-
-- vincular parágrafos a lugares e pessoas sem criar um painel pesado;
-- linha do tempo pesquisável;
-- busca global por nome, empresa, mercado ou evento;
-- versões e comparação de capítulos.
-
-## Guardrails
-
-- nenhuma arte proprietária copiada;
-- nenhuma dependência de rede para escrever;
-- simulação nunca altera o manuscrito;
-- tudo deve tornar o mundo mais legível ou a escrita mais tranquila.
+- edição visual da posição de um lugar diretamente no mapa;
+- retratos personalizados por pessoa;
+- danos por parte do corpo dos Titãs e sucata persistente;
+- linha do tempo com eras e modelos históricos de aeronaves.

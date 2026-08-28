@@ -1,33 +1,24 @@
-# Prince Titan — Design Brief
+# Direção de produto
 
-## Fantasia central
+Prince Titan é uma máquina de observação para escritores. A escrita é uma das salas, não o aplicativo inteiro.
 
-O escritor trabalha diante de um manuscrito limpo enquanto um atlas vivo respira ao lado. O mapa não é um prêmio pelo número de palavras: é a janela constante para um mundo grande demais para caber na página atual.
+## Princípios
 
-## Estrutura do mundo
+1. **Nada fica espremido:** cada sistema ocupa sua própria sala.
+2. **Nada depende de fonte pequena:** corpo mínimo de 15 pontos na referência e escala inicial de 115%.
+3. **O mundo é visível:** lugares, pessoas, famílias, mercados, companhias, aeronaves, Titãs e poderes têm representação direta.
+4. **O mapa é relaxante:** luz de manhã, movimento discreto e informação que aparece quando o autor pede.
+5. **Conteúdo real determina o tamanho:** catorze placas QHD diferentes são usadas nas salas, regiões e observatórios; não existem arquivos de preenchimento.
 
-Quatro instituições controlam território e influência:
+## Salas
 
-1. **Império** — coroa, famílias nobres, indústria militar e memória territorial.
-2. **Governo** — ministérios civis, aviação, portos e comunicações.
-3. **Clã** — parentesco, mercados, caravanas, casas e informação familiar.
-4. **Empreiteira** — robótica, contratos, vendas, origem e destino de máquinas.
+- Sala de Comando
+- Mapa Vivo
+- Máquina de Escrita
+- Arquivo de Pessoas e Linhagens
+- Câmara dos Quatro Poderes
+- Observatório Econômico
 
-Famílias não são um quinto poder. Elas atravessam os quatro poderes e aparecem na árvore biológica/política.
+## Identidade
 
-## Princípios de interface
-
-- O texto ocupa a maior área e nunca é bloqueado pela simulação.
-- Tudo no atlas continua consultável: mercados, empresas, casas, robôs, aviões e pessoas.
-- O movimento é calmo, lento e legível; observar o mapa deve lembrar luz do sol atravessando uma sala.
-- Magenta e branco criam identidade; carvão e latão dão peso de espionagem editorial.
-- Nenhum asset ou personagem de referência é reproduzido.
-- O mundo persiste localmente e funciona offline.
-
-## Fluxos principais
-
-**Escrever:** escolher capítulo → escrever → autosave → exportar.
-
-**Observar:** acompanhar rotas → selecionar lugar → ler controlador, função e influência.
-
-**Entender pessoas:** abrir Lineages → seguir parentesco → comparar origem, papel e aliança.
+Espionagem de meados do século, carvão, marfim, latão, magenta e branco. A linguagem visual é original e usa as referências apenas como clima e material.

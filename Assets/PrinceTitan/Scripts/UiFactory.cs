@@ -32,25 +32,172 @@ namespace PrinceTitan
             return rect;
         }
 
-        public static Image Panel(string name, Transform parent, Color color, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
+        public static Image Panel(string name, Transform parent, Color color, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, bool raycast = false)
         {
             var rect = Rect(name, parent, anchorMin, anchorMax, offsetMin, offsetMax);
             var image = rect.gameObject.AddComponent<Image>();
             image.color = color;
-            image.raycastTarget = false;
+            image.raycastTarget = raycast;
             return image;
         }
 
         public static RawImage Texture(string name, Transform parent, string resourcePath, Color tint,
-            Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
+            Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, bool cover = true)
         {
             var rect = Rect(name, parent, anchorMin, anchorMax, offsetMin, offsetMax);
             var image = rect.gameObject.AddComponent<RawImage>();
             image.texture = Resources.Load<Texture2D>(resourcePath);
             image.color = image.texture == null ? PrinceTitanTheme.Ink : tint;
             image.raycastTarget = false;
-            rect.gameObject.AddComponent<CoverRawImage>();
+            if (cover) rect.gameObject.AddComponent<CoverRawImage>();
             return image;
+        }
+
+        public static Text Label(string name, Transform parent, string value, int size, Color color, TextAnchor alignment,
+            Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, FontStyle style = FontStyle.Normal)
+        {
+            var rect = Rect(name, parent, anchorMin, anchorMax, offsetMin, offsetMax);
+            var label = rect.gameObject.AddComponent<Text>();
+            label.font = PrinceTitanTheme.Font;
+            label.text = value;
+            label.fontSize = Mathf.Max(15, size);
+            label.color = color;
+            label.alignment = alignment;
+            label.fontStyle = style;
+            label.horizontalOverflow = HorizontalWrapMode.Wrap;
+            label.verticalOverflow = VerticalWrapMode.Truncate;
+            label.raycastTarget = false;
+            return label;
+        }
+
+        public static Button Button(string name, Transform parent, string caption, Color background, Color foreground, UnityAction action,
+            Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, int fontSize = 18)
+        {
+            var image = Panel(name, parent, Color.white, anchorMin, anchorMax, offsetMin, offsetMax, true);
+            var button = image.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.transition = Selectable.Transition.ColorTint;
+            button.navigation = new Navigation { mode = Navigation.Mode.Automatic };
+
+            var highlighted = Color.Lerp(background, PrinceTitanTheme.Magenta, background == PrinceTitanTheme.Magenta ? .10f : .50f);
+            var colors = button.colors;
+            colors.normalColor = background;
+            colors.highlightedColor = highlighted;
+            colors.pressedColor = PrinceTitanTheme.Brass;
+            colors.selectedColor = highlighted;
+            colors.disabledColor = PrinceTitanTheme.WithAlpha(background, .30f);
+            colors.colorMultiplier = 1f;
+            colors.fadeDuration = .08f;
+            button.colors = colors;
+
+            Shadow(image, new Color(0f, 0f, 0f, .60f), 3f);
+            Outline(image, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Ivory, .24f), 1f);
+            image.gameObject.AddComponent<ButtonMotion>();
+            if (action != null) button.onClick.AddListener(action);
+            button.onClick.AddListener(() => Report(caption));
+            var label = Label("Caption", image.transform, caption, Mathf.Max(17, fontSize), foreground, TextAnchor.MiddleCenter,
+                Vector2.zero, Vector2.one, new Vector2(10f, 5f), new Vector2(-10f, -5f), FontStyle.Bold);
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = 15;
+            label.resizeTextMaxSize = Mathf.Max(17, fontSize);
+            return button;
+        }
+
+        public static InputField Input(string name, Transform parent, string value, string placeholder, int fontSize,
+            Color background, Color foreground, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax,
+            bool multiline, bool transparent = false)
+        {
+            var image = Panel(name, parent, transparent ? Color.clear : Color.white, anchorMin, anchorMax, offsetMin, offsetMax, true);
+            var field = image.gameObject.AddComponent<InputField>();
+            field.targetGraphic = image;
+            field.lineType = multiline ? InputField.LineType.MultiLineNewline : InputField.LineType.SingleLine;
+            field.navigation = new Navigation { mode = Navigation.Mode.Automatic };
+            var pad = multiline ? new Vector2(20f, 16f) : new Vector2(16f, 6f);
+            field.textComponent = Label("Text", image.transform, value, Mathf.Max(18, fontSize), foreground,
+                multiline ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft, Vector2.zero, Vector2.one,
+                pad, -pad);
+            field.textComponent.supportRichText = false;
+            field.placeholder = Label("Placeholder", image.transform, placeholder, Mathf.Max(18, fontSize),
+                PrinceTitanTheme.WithAlpha(foreground, .44f), multiline ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft,
+                Vector2.zero, Vector2.one, pad, -pad, FontStyle.Italic);
+            field.text = value;
+            field.selectionColor = PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta, .46f);
+            field.caretColor = PrinceTitanTheme.Magenta;
+            field.customCaretColor = true;
+            field.caretWidth = 3;
+
+            var colors = field.colors;
+            colors.normalColor = transparent ? Color.clear : background;
+            colors.highlightedColor = transparent ? PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperLight, .08f) : Color.Lerp(background, PrinceTitanTheme.Ivory, .10f);
+            colors.selectedColor = transparent ? PrinceTitanTheme.WithAlpha(PrinceTitanTheme.PaperLight, .12f) : Color.Lerp(background, PrinceTitanTheme.Ivory, .18f);
+            colors.pressedColor = colors.selectedColor;
+            colors.fadeDuration = .08f;
+            field.colors = colors;
+            if (!transparent) Outline(image, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta, multiline ? .32f : .48f), 1f);
+            if (multiline) image.gameObject.AddComponent<RectMask2D>();
+            return field;
+        }
+
+        public static ScrollParts Scroll(string name, Transform parent, Color background, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
+        {
+            var rootImage = Panel(name, parent, background, anchorMin, anchorMax, offsetMin, offsetMax, true);
+            var root = rootImage.rectTransform;
+            var scroll = root.gameObject.AddComponent<ScrollRect>();
+            scroll.horizontal = false;
+            scroll.vertical = true;
+            scroll.inertia = true;
+            scroll.decelerationRate = .12f;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 38f;
+
+            var viewport = Rect("Viewport", root, Vector2.zero, Vector2.one, new Vector2(2f, 2f), new Vector2(-8f, -2f));
+            viewport.gameObject.AddComponent<RectMask2D>();
+            var content = Rect("Content", viewport, new Vector2(0f, 1f), Vector2.one, Vector2.zero, Vector2.zero);
+            content.pivot = new Vector2(.5f, 1f);
+            content.sizeDelta = Vector2.zero;
+            var layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            layout.padding = new RectOffset(8, 8, 8, 8);
+            layout.spacing = 8f;
+            layout.childControlHeight = false;
+            layout.childControlWidth = true;
+            layout.childForceExpandHeight = false;
+            layout.childForceExpandWidth = true;
+            var fitter = content.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            scroll.viewport = viewport;
+            scroll.content = content;
+            return new ScrollParts { scroll = scroll, viewport = viewport, content = content };
+        }
+
+        public static RectTransform HorizontalGroup(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
+            Vector2 offsetMin, Vector2 offsetMax, float spacing, int left = 0, int right = 0)
+        {
+            var rect = Rect(name, parent, anchorMin, anchorMax, offsetMin, offsetMax);
+            var group = rect.gameObject.AddComponent<HorizontalLayoutGroup>();
+            group.spacing = spacing;
+            group.padding = new RectOffset(left, right, 0, 0);
+            group.childAlignment = TextAnchor.MiddleCenter;
+            group.childControlHeight = true;
+            group.childControlWidth = true;
+            group.childForceExpandHeight = true;
+            group.childForceExpandWidth = true;
+            return rect;
+        }
+
+        public static LayoutElement Layout(RectTransform rect, float height, float minWidth = -1f, float flexibleWidth = -1f)
+        {
+            var element = rect.gameObject.AddComponent<LayoutElement>();
+            element.preferredHeight = height;
+            element.minHeight = height;
+            if (minWidth >= 0f) element.minWidth = minWidth;
+            if (flexibleWidth >= 0f) element.flexibleWidth = flexibleWidth;
+            return element;
+        }
+
+        public static Image Rule(string name, Transform parent, Color color, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
+        {
+            return Panel(name, parent, color, anchorMin, anchorMax, offsetMin, offsetMax);
         }
 
         public static void Outline(Graphic graphic, Color color, float distance = 1f)
@@ -69,136 +216,18 @@ namespace PrinceTitan
             shadow.useGraphicAlpha = true;
         }
 
-        public static Text Label(string name, Transform parent, string value, int size, Color color, TextAnchor alignment,
-            Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, FontStyle style = FontStyle.Normal)
+        public static void SetButtonCaption(Button button, string caption)
         {
-            var rect = Rect(name, parent, anchorMin, anchorMax, offsetMin, offsetMax);
-            var label = rect.gameObject.AddComponent<Text>();
-            label.font = PrinceTitanTheme.Font;
-            label.text = value;
-            label.fontSize = size;
-            label.color = color;
-            label.alignment = alignment;
-            label.fontStyle = style;
-            label.horizontalOverflow = HorizontalWrapMode.Wrap;
-            label.verticalOverflow = VerticalWrapMode.Truncate;
-            label.raycastTarget = false;
-            return label;
+            if (button == null) return;
+            var label = button.GetComponentInChildren<Text>();
+            if (label != null) label.text = caption;
         }
 
-        public static Button Button(string name, Transform parent, string caption, Color background, Color foreground, UnityAction action,
-            Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, int fontSize = 13)
+        public static void ClearChildren(Transform transform)
         {
-            var image = Panel(name, parent, Color.white, anchorMin, anchorMax, offsetMin, offsetMax);
-            image.raycastTarget = true;
-            var button = image.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
-            button.transition = Selectable.Transition.ColorTint;
-            button.navigation = new Navigation { mode = Navigation.Mode.Automatic };
-
-            var highlighted = Color.Lerp(background, PrinceTitanTheme.Magenta, background == PrinceTitanTheme.Magenta ? .12f : .58f);
-            var colors = button.colors;
-            colors.normalColor = background;
-            colors.highlightedColor = highlighted;
-            colors.pressedColor = PrinceTitanTheme.Brass;
-            colors.selectedColor = highlighted;
-            colors.disabledColor = PrinceTitanTheme.WithAlpha(background, .32f);
-            colors.colorMultiplier = 1f;
-            colors.fadeDuration = .055f;
-            button.colors = colors;
-
-            Shadow(image, new Color(0f, 0f, 0f, .44f), 2f);
-            Outline(image, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Ivory, .18f), 1f);
-            image.gameObject.AddComponent<PressFeedback>();
-            if (action != null) button.onClick.AddListener(action);
-            button.onClick.AddListener(() => Report(caption));
-            Label("Label", image.transform, caption, fontSize, foreground, TextAnchor.MiddleCenter,
-                Vector2.zero, Vector2.one, new Vector2(6f, 3f), new Vector2(-6f, -3f), FontStyle.Bold);
-            return button;
-        }
-
-        public static InputField Input(string name, Transform parent, string value, string placeholder, int fontSize, Color background, Color foreground,
-            Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, bool multiline)
-        {
-            var image = Panel(name, parent, Color.white, anchorMin, anchorMax, offsetMin, offsetMax);
-            image.raycastTarget = true;
-            var field = image.gameObject.AddComponent<InputField>();
-            field.targetGraphic = image;
-            field.lineType = multiline ? InputField.LineType.MultiLineNewline : InputField.LineType.SingleLine;
-            field.navigation = new Navigation { mode = Navigation.Mode.Automatic };
-            field.textComponent = Label("Text", image.transform, value, fontSize, foreground,
-                multiline ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft,
-                Vector2.zero, Vector2.one, multiline ? new Vector2(20f, 16f) : new Vector2(14f, 4f),
-                multiline ? new Vector2(-20f, -16f) : new Vector2(-14f, -4f));
-            field.textComponent.supportRichText = false;
-            field.placeholder = Label("Placeholder", image.transform, placeholder, fontSize,
-                PrinceTitanTheme.WithAlpha(foreground, .38f), multiline ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft,
-                Vector2.zero, Vector2.one, multiline ? new Vector2(20f, 16f) : new Vector2(14f, 4f),
-                multiline ? new Vector2(-20f, -16f) : new Vector2(-14f, -4f), FontStyle.Italic);
-            field.text = value;
-            field.selectionColor = PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta, .46f);
-            field.caretColor = PrinceTitanTheme.Magenta;
-            field.customCaretColor = true;
-            field.caretWidth = 2;
-
-            var colors = field.colors;
-            colors.normalColor = background;
-            colors.highlightedColor = Color.Lerp(background, PrinceTitanTheme.Ivory, .12f);
-            colors.selectedColor = Color.Lerp(background, PrinceTitanTheme.Ivory, .20f);
-            colors.pressedColor = colors.selectedColor;
-            colors.fadeDuration = .06f;
-            field.colors = colors;
-            Outline(image, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta, multiline ? .32f : .45f), 1f);
-            if (multiline) image.gameObject.AddComponent<RectMask2D>();
-            var status = image.gameObject.AddComponent<InputStatusRelay>();
-            status.message = multiline ? "EDITOR READY — TYPE YOUR SCENE" : name.ToUpperInvariant() + " SELECTED";
-            return field;
-        }
-
-        public static ScrollParts Scroll(string name, Transform parent, Color background, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
-        {
-            var rootImage = Panel(name, parent, background, anchorMin, anchorMax, offsetMin, offsetMax);
-            rootImage.raycastTarget = true;
-            var root = rootImage.rectTransform;
-            var scroll = root.gameObject.AddComponent<ScrollRect>();
-            scroll.horizontal = false;
-            scroll.vertical = true;
-            scroll.movementType = ScrollRect.MovementType.Elastic;
-            scroll.scrollSensitivity = 34f;
-
-            var viewport = Rect("Viewport", root, Vector2.zero, Vector2.one, new Vector2(1f, 1f), new Vector2(-5f, -1f));
-            viewport.gameObject.AddComponent<RectMask2D>();
-            var content = Rect("Content", viewport, new Vector2(0f, 1f), Vector2.one, Vector2.zero, Vector2.zero);
-            content.pivot = new Vector2(.5f, 1f);
-            content.sizeDelta = Vector2.zero;
-            var layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
-            layout.padding = new RectOffset(6, 6, 6, 6);
-            layout.spacing = 6f;
-            layout.childControlHeight = false;
-            layout.childControlWidth = true;
-            layout.childForceExpandHeight = false;
-            layout.childForceExpandWidth = true;
-            var fitter = content.gameObject.AddComponent<ContentSizeFitter>();
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-            scroll.viewport = viewport;
-            scroll.content = content;
-            return new ScrollParts { scroll = scroll, viewport = viewport, content = content };
-        }
-
-        public static LayoutElement Layout(RectTransform rect, float height, float minWidth = -1f, float flexibleWidth = -1f)
-        {
-            var element = rect.gameObject.AddComponent<LayoutElement>();
-            element.preferredHeight = height;
-            element.minHeight = height;
-            if (minWidth >= 0f) element.minWidth = minWidth;
-            if (flexibleWidth >= 0f) element.flexibleWidth = flexibleWidth;
-            return element;
-        }
-
-        public static Image Rule(string name, Transform parent, Color color, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
-        {
-            return Panel(name, parent, color, anchorMin, anchorMax, offsetMin, offsetMax);
+            if (transform == null) return;
+            for (var i = transform.childCount - 1; i >= 0; i--)
+                UnityEngine.Object.Destroy(transform.GetChild(i).gameObject);
         }
 
         public static EventSystem EnsureEventSystem()
@@ -226,7 +255,7 @@ namespace PrinceTitan
             var input = go.GetComponent<InputSystemUIInputModule>();
             if (input == null) input = go.AddComponent<InputSystemUIInputModule>();
             if (input.actionsAsset == null) input.AssignDefaultActions();
-            input.deselectOnBackgroundClick = false;
+            input.deselectOnBackgroundClick = true;
             input.enabled = true;
 #else
             var input = go.GetComponent<StandaloneInputModule>();
@@ -283,31 +312,18 @@ namespace PrinceTitan
         }
     }
 
-    public sealed class PressFeedback : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
+    public sealed class ButtonMotion : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
     {
-        public void OnPointerDown(PointerEventData eventData)
+        private Vector3 target = Vector3.one;
+
+        private void Update()
         {
-            transform.localScale = new Vector3(.975f, .975f, 1f);
+            transform.localScale = Vector3.Lerp(transform.localScale, target, Time.unscaledDeltaTime * 18f);
         }
 
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            transform.localScale = Vector3.one;
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            transform.localScale = Vector3.one;
-        }
-    }
-
-    public sealed class InputStatusRelay : MonoBehaviour, ISelectHandler
-    {
-        public string message;
-
-        public void OnSelect(BaseEventData eventData)
-        {
-            UiFactory.Report(message);
-        }
+        public void OnPointerEnter(PointerEventData eventData) { target = new Vector3(1.025f, 1.025f, 1f); }
+        public void OnPointerExit(PointerEventData eventData) { target = Vector3.one; }
+        public void OnPointerDown(PointerEventData eventData) { target = new Vector3(.975f, .975f, 1f); }
+        public void OnPointerUp(PointerEventData eventData) { target = new Vector3(1.025f, 1.025f, 1f); }
     }
 }

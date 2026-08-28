@@ -1,33 +1,44 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace PrinceTitan
 {
-    public sealed class LineageConnectionsGraphic : MaskableGraphic
+    public sealed class LineageBoardGraphic : MaskableGraphic
     {
+        private List<PersonData> people;
+
+        public void Configure(List<PersonData> value)
+        {
+            people = value;
+            SetVerticesDirty();
+        }
+
         protected override void OnPopulateMesh(VertexHelper vh)
         {
             vh.Clear();
             raycastTarget = false;
-            foreach (var child in WorldSeed.People)
+            if (people == null) return;
+            foreach (var child in people)
             {
-                DrawParent(vh, child.parentAId, child.treePosition);
-                DrawParent(vh, child.parentBId, child.treePosition);
+                DrawParent(vh, child.parentAId, child.treePosition, PrinceTitanTheme.Ivory);
+                DrawParent(vh, child.parentBId, child.treePosition, PrinceTitanTheme.Magenta);
             }
         }
 
-        private void DrawParent(VertexHelper vh, string parentId, Vector2 childPosition)
+        private void DrawParent(VertexHelper vh, string parentId, Vector2 childPosition, Color color)
         {
             if (string.IsNullOrEmpty(parentId)) return;
-            var parent = WorldSeed.People.Find(p => p.id == parentId);
+            var parent = people.Find(p => p.id == parentId);
             if (parent == null) return;
-            var a = Position(parent.treePosition) + new Vector2(0f, -38f);
-            var b = Position(childPosition) + new Vector2(0f, 38f);
+            var a = Position(parent.treePosition) + new Vector2(0f, -28f);
+            var b = Position(childPosition) + new Vector2(0f, 28f);
             var middle = (a.y + b.y) * .5f;
-            AddLine(vh, a, new Vector2(a.x, middle), 2f, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Brass, .66f));
-            AddLine(vh, new Vector2(a.x, middle), new Vector2(b.x, middle), 2f, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Brass, .66f));
-            AddLine(vh, new Vector2(b.x, middle), b, 2f, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Brass, .66f));
-            AddCircle(vh, b, 3f, PrinceTitanTheme.Magenta, 10);
+            var wire = PrinceTitanTheme.WithAlpha(color, .84f);
+            AddLine(vh, a, new Vector2(a.x, middle), 3f, wire);
+            AddLine(vh, new Vector2(a.x, middle), new Vector2(b.x, middle), 3f, wire);
+            AddLine(vh, new Vector2(b.x, middle), b, 3f, wire);
+            AddCircle(vh, b, 5f, color, 14);
         }
 
         private Vector2 Position(Vector2 normalized)
@@ -49,13 +60,13 @@ namespace PrinceTitan
 
         private static void AddCircle(VertexHelper vh, Vector2 center, float radius, Color color, int segments)
         {
-            var centerIndex = vh.currentVertCount;
+            var start = vh.currentVertCount;
             vh.AddVert(center, color, Vector2.zero);
             for (var i = 0; i <= segments; i++)
             {
                 var angle = Mathf.PI * 2f * i / segments;
                 vh.AddVert(center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius, color, Vector2.zero);
-                if (i > 0) vh.AddTriangle(centerIndex, centerIndex + i, centerIndex + i + 1);
+                if (i > 0) vh.AddTriangle(start, start + i, start + i + 1);
             }
         }
     }

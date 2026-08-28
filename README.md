@@ -1,53 +1,43 @@
 # Prince Titan
 
-**Prince Titan** é uma engine de escrita em Unity com um mundo vivo sempre visível ao lado do manuscrito. O objetivo é abrir o aplicativo, escrever e, quando quiser respirar, simplesmente observar aviões, robôs, mercados, companhias, casas e relações de poder se movendo no atlas.
+**Prince Titan** é uma engine nativa de mundo e escrita construída em Unity. Não é uma página HTML nem um editor de texto coberto por uma imagem: o aplicativo é dividido em salas cinematográficas que representam partes diferentes do universo do autor.
 
-## O que já funciona
+## O que existe na reconstrução 0.3
 
-- editor de capítulos com título, contagem de palavras e atalhos;
-- autosave local em JSON e backup automático;
-- exportação do capítulo ativo em UTF-8 `.txt`;
-- interface Unity redesenhada como uma mesa de operações de espionagem, com materiais escuros, marfim, latão e magenta;
-- duas placas de arte HD originais: mesa de escrita secreta e atlas cartográfico vivo em pergaminho;
-- mapa lateral e atlas expandido com arte cartográfica HD e uma camada procedural de inteligência em tempo real;
-- 14 lugares visíveis: cidades, mercados, empresas, casas, porto, aeródromo, relé e fábricas de robôs;
-- aviões em rotas contínuas e um transporte robótico em movimento;
-- atividade dos mercados, relógio mundial e eventos ambientes;
-- quatro poderes que disputam influência: Império, Governo, Clã e Empreiteira;
-- filtros por poder sem esconder permanentemente nenhum dado;
-- árvore biológica e política com nome, família, origem, nascimento, função e aliança de cada pessoa;
-- simulação independente da escrita: escrever nunca altera artificialmente quem vence o mapa.
-- entrada moderna e redundante para mouse/teclado, com foco automático, estados de hover/pressionado e indicador `INPUT ONLINE`;
+- **Sala de Comando:** entrada cinematográfica com cinco grandes portas e o pulso geral do mundo.
+- **Mapa Vivo:** mapa amplo com zoom e arraste, 14 lugares iniciais, aeronaves e Titãs em movimento, rotas, filtros e influência em tempo real.
+- **Escrita:** manuscrito operado como uma máquina física, capítulos, contagem de palavras, autosave e exportação.
+- **Pessoas:** árvore biológica e política clicável, famílias, origem, função, ano de nascimento e aliança.
+- **Poderes:** Império, Governo, Clã e Empreiteira controlam regiões com influência variável; cada região tem uma placa visual exclusiva.
+- **Economia:** mercados, companhias, casas, cidades, aeródromos, portos, relés e fábricas de robôs.
+- **Criação de mundo:** novas pessoas e novos lugares podem ser registrados dentro do aplicativo e aparecem imediatamente na simulação.
+- **Conforto:** fonte grande por padrão, interface escalável em 100%, 125%, 150% ou 175%, janela redimensionável e tela cheia opcional.
+- **Atmosfera:** catorze cenas QHD originais, quatro observatórios de local e um ambiente sonoro mecânico suave que pode ser desligado.
 
-## Direção visual
+O magenta e o branco são usados como sinais sobre carvão, marfim, madeira escura e latão. As referências fornecidas serviram somente para direção de clima: não há personagem, objeto, símbolo, interface ou mapa copiado.
 
-A identidade é original: espionagem editorial de meados do século, cartões de inteligência, carvão, branco marfim, magenta e latão. O mapa mistura papel aquecido pelo sol, tinta gravada, cidades, ferrovias, portos, indústria, rotas pontilhadas e movimento discreto. As imagens de referência serviram apenas para definir clima e composição; nenhum asset, personagem, arma, logotipo ou interface proprietária foi copiado.
-
-## Baixar e abrir rapidamente
+## Baixar e abrir
 
 1. Abra **Releases** neste repositório.
-2. Baixe `PrinceTitan-Windows-x64.zip` da release mais recente.
-3. Extraia o ZIP.
-4. Dê dois cliques em `PrinceTitan.exe`.
+2. Baixe **PrinceTitan-Windows-x64.zip** da versão mais recente.
+3. Extraia todo o ZIP.
+4. Dê dois cliques em **PrinceTitan.exe**.
 
-Você não precisa abrir o Unity nem compilar no seu PC para usar uma release pronta.
+O usuário final não precisa abrir o Unity e não precisa compilar.
 
-## Primeiro build no GitHub
+## Controles
 
-O GitHub Actions precisa ativar a sua licença Unity Personal uma única vez. Adicione estes três Secrets em **Settings → Secrets and variables → Actions**:
-
-- `UNITY_LICENSE`: conteúdo completo de `C:\ProgramData\Unity\Unity_lic.ulf`;
-- `UNITY_EMAIL`: e-mail da conta Unity;
-- `UNITY_PASSWORD`: senha da conta Unity.
-
-Depois abra **Actions → Prince Titan Unity Windows Release → Run workflow**. O workflow compila no servidor e cria a release com o ZIP automaticamente. Nunca coloque senha ou licença em arquivo do repositório, issue ou conversa.
+- clique nos nomes das salas para navegar;
+- no Mapa Vivo, arraste para mover e use a roda do mouse para aproximar;
+- Ctrl+S salva, Ctrl+E exporta o capítulo e Ctrl+N cria um capítulo;
+- Esc fecha uma janela ou retorna à Sala de Comando.
 
 ## Dados locais
 
-No Windows, o projeto e os exports ficam dentro da pasta persistente do Unity, em `AppData/LocalLow/Khidam/Prince Titan/PrinceTitan`. O arquivo principal é `project.json`; cada gravação também mantém `project.json.backup`.
+O projeto e os exports ficam em **AppData/LocalLow/Khidam/Prince Titan/PrinceTitan**. O arquivo principal é **project.json**; cada salvamento mantém **project.json.backup**. Projetos antigos são migrados sem apagar os capítulos já escritos.
 
-## Código anterior preservado
+## Build automático
 
-Os protótipos HTML/WinForms anteriores continuam nas pastas `app/`, `launcher/` e `src/`. A implementação canônica nova é o projeto Unity em `Assets/`, `Packages/` e `ProjectSettings/`.
+O GitHub Actions usa Unity 2022.3 para montar a versão Windows x64 e publicar uma Release. A pipeline valida o executável, os dados QHD e o tamanho extraído antes de publicar.
 
-Licença MIT para o código original deste repositório.
+Licença MIT para o código original.

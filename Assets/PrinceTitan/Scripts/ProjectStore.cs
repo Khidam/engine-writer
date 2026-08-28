@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -34,7 +35,7 @@ namespace PrinceTitan
             }
             catch (Exception exception)
             {
-                Debug.LogWarning("Prince Titan could not load the project: " + exception.Message);
+                Debug.LogWarning("Prince Titan não conseguiu abrir o projeto: " + exception.Message);
             }
 
             var created = WorldSeed.CreateDefaultProject();
@@ -46,6 +47,7 @@ namespace PrinceTitan
         {
             if (project == null) return;
             Directory.CreateDirectory(RootPath);
+            project.schema = "prince-titan/2";
             var json = JsonUtility.ToJson(project, true);
             var temporary = ProjectPath + ".tmp";
             var backup = ProjectPath + ".backup";
@@ -61,14 +63,38 @@ namespace PrinceTitan
         public static string ExportChapter(ProjectData project, ChapterData chapter)
         {
             if (chapter == null) return string.Empty;
-            var folder = Path.Combine(RootPath, "Exports");
-            Directory.CreateDirectory(folder);
-            var name = SafeFileName(string.IsNullOrWhiteSpace(chapter.title) ? "chapter" : chapter.title);
+            var folder = ExportFolder();
+            var name = SafeFileName(string.IsNullOrWhiteSpace(chapter.title) ? "capitulo" : chapter.title);
             var path = Path.Combine(folder, name + "-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".txt");
-            var body = (chapter.title ?? "Untitled") + Environment.NewLine + Environment.NewLine + (chapter.body ?? string.Empty);
+            var body = (chapter.title ?? "Sem título") + Environment.NewLine + Environment.NewLine + (chapter.body ?? string.Empty);
             File.WriteAllText(path, body, new UTF8Encoding(false));
-            var manifestPath = Path.Combine(folder, "PrinceTitan-project.json");
-            File.WriteAllText(manifestPath, JsonUtility.ToJson(project, true), new UTF8Encoding(false));
+            WriteManifest(project, folder);
+            return path;
+        }
+
+        public static string ExportWorldBook(ProjectData project)
+        {
+            var folder = ExportFolder();
+            var path = Path.Combine(folder, "PrinceTitan-Mundo-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".md");
+            var text = new StringBuilder();
+            text.AppendLine("# " + project.projectName);
+            text.AppendLine();
+            text.AppendLine("## Quatro poderes");
+            foreach (var faction in project.factions)
+            {
+                var state = project.world.factions.FirstOrDefault(f => f.factionId == faction.id);
+                text.AppendLine("- **" + faction.name + "** — " + faction.kind + "; influência " + (state == null ? 0f : state.influence).ToString("0") + "%. " + faction.motto);
+            }
+            text.AppendLine();
+            text.AppendLine("## Pessoas e famílias");
+            foreach (var person in project.people)
+                text.AppendLine("- **" + person.name + "** — " + person.family + "; " + person.role + "; origem: " + person.origin + "; nascimento: " + person.birthYear + ".");
+            text.AppendLine();
+            text.AppendLine("## Lugares, mercados e companhias");
+            foreach (var site in project.sites)
+                text.AppendLine("- **" + site.name + "** — " + site.kind + "; " + site.note);
+            File.WriteAllText(path, text.ToString(), new UTF8Encoding(false));
+            WriteManifest(project, folder);
             return path;
         }
 
@@ -86,13 +112,32 @@ namespace PrinceTitan
             return count;
         }
 
+        private static string ExportFolder()
+        {
+            var folder = Path.Combine(RootPath, "Exports");
+            Directory.CreateDirectory(folder);
+            return folder;
+        }
+
+        private static void WriteManifest(ProjectData project, string folder)
+        {
+            File.WriteAllText(Path.Combine(folder, "PrinceTitan-projeto.json"), JsonUtility.ToJson(project, true), new UTF8Encoding(false));
+        }
+
         private static void Repair(ProjectData project)
         {
-            if (project.world == null) project.world = WorldSeed.CreateDefaultProject().world;
-            if (project.world.factions == null || project.world.factions.Count != 4) project.world.factions = WorldSeed.CreateDefaultProject().world.factions;
-            if (project.world.markets == null || project.world.markets.Count == 0) project.world.markets = WorldSeed.CreateDefaultProject().world.markets;
-            if (project.world.movers == null || project.world.movers.Count == 0) project.world.movers = WorldSeed.CreateDefaultProject().world.movers;
-            if (string.IsNullOrEmpty(project.activeChapterId)) project.activeChapterId = project.chapters[0].id;
+            var defaults = WorldSeed.CreateDefaultProject();
+            if (project.world == null) project.world = defaults.world;
+            if (project.world.factions == null || project.world.factions.Count != 4) project.world.factions = defaults.world.factions;
+            if (project.world.markets == null || project.world.markets.Count == 0) project.world.markets = defaults.world.markets;
+            if (project.world.movers == null || project.world.movers.Count == 0) project.world.movers = defaults.world.movers;
+            if (project.factions == null || project.factions.Count != 4) project.factions = WorldSeed.CloneFactions();
+            if (project.sites == null || project.sites.Count == 0) project.sites = WorldSeed.CloneSites();
+            if (project.people == null || project.people.Count == 0) project.people = WorldSeed.ClonePeople();
+            if (string.IsNullOrEmpty(project.activeChapterId) || project.chapters.All(c => c.id != project.activeChapterId))
+                project.activeChapterId = project.chapters[0].id;
+            if (string.IsNullOrWhiteSpace(project.projectName)) project.projectName = "Príncipe dos Titãs";
+            project.schema = "prince-titan/2";
         }
 
         private static string SafeFileName(string value)
