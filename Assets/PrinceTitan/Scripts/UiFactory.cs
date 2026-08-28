@@ -150,7 +150,8 @@ namespace PrinceTitan
             field.colors = colors;
             Outline(image, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta, multiline ? .32f : .45f), 1f);
             if (multiline) image.gameObject.AddComponent<RectMask2D>();
-            field.onSelect.AddListener(_ => Report(multiline ? "EDITOR READY — TYPE YOUR SCENE" : name.ToUpperInvariant() + " SELECTED"));
+            var status = image.gameObject.AddComponent<InputStatusRelay>();
+            status.message = multiline ? "EDITOR READY — TYPE YOUR SCENE" : name.ToUpperInvariant() + " SELECTED";
             return field;
         }
 
@@ -297,6 +298,16 @@ namespace PrinceTitan
         public void OnPointerExit(PointerEventData eventData)
         {
             transform.localScale = Vector3.one;
+        }
+    }
+
+    public sealed class InputStatusRelay : MonoBehaviour, ISelectHandler
+    {
+        public string message;
+
+        public void OnSelect(BaseEventData eventData)
+        {
+            UiFactory.Report(message);
         }
     }
 }
