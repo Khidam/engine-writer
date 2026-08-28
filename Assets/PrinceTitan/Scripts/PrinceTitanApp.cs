@@ -189,7 +189,7 @@ namespace PrinceTitan
 
         private void BuildTopBar()
         {
-            var bar = UiFactory.Panel("Top Bar", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft, .94f),
+            var bar = UiFactory.Panel("Top Bar", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft, .90f),
                 new Vector2(0f,.93f), Vector2.one, Vector2.zero, Vector2.zero);
             UiFactory.Shadow(bar, new Color(0f,0f,0f,.72f), 4f);
             UiFactory.Outline(bar, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Brass,.36f), 1f);
@@ -218,7 +218,7 @@ namespace PrinceTitan
 
         private void BuildChapterRail()
         {
-            var rail = UiFactory.Panel("Chapter Rail", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft, .84f),
+            var rail = UiFactory.Panel("Chapter Rail", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft, .62f),
                 new Vector2(0f,0f), new Vector2(.16f,.93f), Vector2.zero, new Vector2(-2f,0f));
             UiFactory.Outline(rail, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta,.42f), 1f);
             UiFactory.Rule("Rail Accent", rail.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta,.75f),
@@ -248,23 +248,23 @@ namespace PrinceTitan
 
         private void BuildWritingDesk()
         {
-            var desk = UiFactory.Panel("Writing Desk", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Ivory, .88f),
+            var desk = UiFactory.Panel("Writing Desk", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Ivory, .56f),
                 new Vector2(.16f,0f), new Vector2(.685f,.93f), new Vector2(2f,0f), new Vector2(-2f,0f));
             UiFactory.Shadow(desk, new Color(0f,0f,0f,.62f), 5f);
             UiFactory.Outline(desk, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Brass,.62f), 1f);
-            UiFactory.Panel("Paper Bloom", desk.transform, new Color(1f,.97f,.90f,.22f),
+            UiFactory.Panel("Paper Bloom", desk.transform, new Color(1f,.97f,.90f,.10f),
                 new Vector2(.025f,.02f), new Vector2(.975f,.98f), Vector2.zero, Vector2.zero);
             UiFactory.Label("Desk Eyebrow", desk.transform, "MANUSCRIPT  /  ACTIVE CHAPTER", 10, PrinceTitanTheme.Magenta, TextAnchor.MiddleLeft,
                 new Vector2(.05f,.925f), new Vector2(.70f,.975f), Vector2.zero, Vector2.zero, FontStyle.Bold);
             wordCountText = UiFactory.Label("Word Count", desk.transform, "0 WORDS", 10, PrinceTitanTheme.PaperInk, TextAnchor.MiddleRight,
                 new Vector2(.70f,.925f), new Vector2(.95f,.975f), Vector2.zero, Vector2.zero, FontStyle.Bold);
             titleInput = UiFactory.Input("Chapter Title", desk.transform, string.Empty, "Chapter title", 23,
-                new Color(1f,.98f,.94f,.68f), PrinceTitanTheme.Ink, new Vector2(.045f,.85f), new Vector2(.955f,.925f), Vector2.zero, Vector2.zero, false);
+                new Color(1f,.98f,.94f,.52f), PrinceTitanTheme.Ink, new Vector2(.045f,.85f), new Vector2(.955f,.925f), Vector2.zero, Vector2.zero, false);
             UiFactory.Rule("Title Rule", desk.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta, .35f),
                 new Vector2(.05f,.845f), new Vector2(.95f,.845f), Vector2.zero, new Vector2(0f,1f));
 
             bodyInput = UiFactory.Input("Chapter Body", desk.transform, string.Empty,
-                "Write the scene. The atlas will keep breathing beside you.", 18, new Color(1f,.98f,.94f,.62f), PrinceTitanTheme.Ink,
+                "Write the scene. The atlas will keep breathing beside you.", 18, new Color(1f,.98f,.94f,.42f), PrinceTitanTheme.Ink,
                 new Vector2(.04f,.075f), new Vector2(.96f,.835f), Vector2.zero, Vector2.zero, true);
             bodyInput.textComponent.lineSpacing = 1.18f;
             bodyInput.characterLimit = 0;
@@ -282,7 +282,7 @@ namespace PrinceTitan
 
         private void BuildCompactAtlas()
         {
-            var panel = UiFactory.Panel("Atlas Side", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft, .82f),
+            var panel = UiFactory.Panel("Atlas Side", canvas.transform, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.InkSoft, .62f),
                 new Vector2(.685f,0f), new Vector2(1f,.93f), new Vector2(2f,0f), Vector2.zero);
             UiFactory.Outline(panel, PrinceTitanTheme.WithAlpha(PrinceTitanTheme.Magenta,.50f), 1f);
             UiFactory.Label("Atlas Title", panel.transform, "THE LIVING ATLAS", 17, PrinceTitanTheme.Ivory, TextAnchor.MiddleLeft,
@@ -352,7 +352,7 @@ namespace PrinceTitan
             atlasOverlay = overlayImage.gameObject;
             UiFactory.Texture("Atlas Operations Backdrop", atlasOverlay.transform, "PrinceTitan/spy_desk_hd", new Color(.78f,.70f,.78f,1f),
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            UiFactory.Panel("Atlas Night Glass", atlasOverlay.transform, new Color(.035f,.025f,.045f,.72f),
+            UiFactory.Panel("Atlas Night Glass", atlasOverlay.transform, new Color(.035f,.025f,.045f,.62f),
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             UiFactory.Label("Title", atlasOverlay.transform, "ATLAS OF INFLUENCE", 24, PrinceTitanTheme.Ivory, TextAnchor.MiddleLeft,
                 new Vector2(.025f,.91f), new Vector2(.45f,.985f), Vector2.zero, Vector2.zero, FontStyle.Bold);
@@ -409,7 +409,7 @@ namespace PrinceTitan
             lineageOverlay = overlayImage.gameObject;
             UiFactory.Texture("Lineage Operations Backdrop", lineageOverlay.transform, "PrinceTitan/spy_desk_hd", new Color(.72f,.64f,.72f,1f),
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            UiFactory.Panel("Lineage Night Glass", lineageOverlay.transform, new Color(.035f,.025f,.045f,.76f),
+            UiFactory.Panel("Lineage Night Glass", lineageOverlay.transform, new Color(.035f,.025f,.045f,.66f),
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             UiFactory.Label("Title", lineageOverlay.transform, "BIOLOGICAL & POLITICAL LINEAGES", 24, PrinceTitanTheme.Ivory, TextAnchor.MiddleLeft,
                 new Vector2(.025f,.91f), new Vector2(.60f,.985f), Vector2.zero, Vector2.zero, FontStyle.Bold);
@@ -423,9 +423,9 @@ namespace PrinceTitan
             tree.gameObject.AddComponent<RectMask2D>();
             UiFactory.Shadow(tree, new Color(0f,0f,0f,.82f), 6f);
             UiFactory.Outline(tree, PrinceTitanTheme.Brass, 2f);
-            UiFactory.Texture("Cartographic Bloodline", tree.transform, "PrinceTitan/living_atlas_hd", new Color(1f,.92f,.80f,.20f),
+            UiFactory.Texture("Cartographic Bloodline", tree.transform, "PrinceTitan/living_atlas_hd", new Color(1f,.92f,.80f,.28f),
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            UiFactory.Panel("Lineage Paper Veil", tree.transform, new Color(1f,.95f,.82f,.77f),
+            UiFactory.Panel("Lineage Paper Veil", tree.transform, new Color(1f,.95f,.82f,.62f),
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             var connectionsRect = UiFactory.Rect("Connections", tree.transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             connectionsRect.gameObject.AddComponent<LineageConnectionsGraphic>();
